@@ -76,6 +76,10 @@ a {
   opacity: 0.5;
 }
 
+svg {
+  pointer-events: none;
+}
+
 /*******************************************/
 /* Main Container */
 #main {
@@ -239,6 +243,9 @@ a {
 /*******************************************/
 /* Post - Replies Section */
 .replies {
+  display: flex;
+  flex-direction: column;
+  row-gap: var(--block-gap);
   padding-inline-start: clamp(1.125rem, 4vw, 1.75rem);
   position: relative;
 }
@@ -256,17 +263,18 @@ a {
 
 /*******************************************/
 /* Form Container */
-.form-post {
+.form {
   display: grid;
   align-items: center;
   justify-items: flex-start;
-  grid-template-areas: 'textarea textarea' 'user-avatar submit-btn';
+  grid-template-areas: 'textarea textarea' 'user-avatar form-buttons';
   gap: var(--block-gap);
 }
 
-.form-post__txtarea {
+.form__txtarea {
   width: 100%;
-  height: 6rem;
+  height: 100%;
+  min-height: 6rem;
   font-family: var(--ff-rubik);
   border: 1px solid var(--light-gray);
   border-radius: var(--border-radius);
@@ -277,12 +285,20 @@ a {
   grid-area: textarea;
 }
 
-.form-post__txtarea:focus-visible {
+.form__txtarea:focus-visible {
   border-color: var(--moderate-blue);
   outline: none;
 }
 
-.form-post__button {
+.form-buttons {
+  display: flex;
+  flex-flow: row-reverse wrap;
+  gap: var(--block-gap);
+  justify-self: flex-end;
+  grid-area: form-buttons;
+}
+
+.form__button {
   width: 6.5rem;
   font-size: var(--fs-default);
   text-transform: uppercase;
@@ -290,11 +306,9 @@ a {
   background-color: var(--moderate-blue);
   border-radius: var(--border-radius);
   padding: 0.875rem;
-  justify-self: flex-end;
-  grid-area: submit-btn;
 }
 
-.form-post-avatar {
+.form-avatar {
   grid-area: user-avatar;
 }
 
@@ -310,6 +324,10 @@ a {
   top: 0;
   left: 0;
   background-color: hsl(0, 0%, 0%, 0.4);
+}
+
+.del-comment-con.active {
+  display: flex;
 }
 
 .del-comment {
@@ -342,7 +360,8 @@ a {
   padding-block: 1em;
 }
 
-#cancel-del-comment {
+#cancel-del-comment,
+[data-cancel-reply] {
   background-color: var(--grayish-blue);
 }
 
@@ -410,9 +429,13 @@ footer {
     left: clamp(2rem, 4vw, 2.75rem);
   }
 
-  .form-post {
+  .form {
     align-items: flex-start;
     grid-auto-columns: min-content 1fr min-content;
-    grid-template-areas: 'user-avatar textarea submit-btn';
+    grid-template-areas: 'user-avatar textarea form-buttons';
+  }
+
+  .form-buttons {
+    flex-direction: column;
   }
 }
