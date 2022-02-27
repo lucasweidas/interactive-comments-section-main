@@ -1,4 +1,4 @@
-export function newPostComment(userData, textValue, replyingTo) {
+export function newPostComment(userData, textValue) {
   const createdAt = 'today';
   const postDiv = document.createElement('div');
 
@@ -71,16 +71,13 @@ export function newPostComment(userData, textValue, replyingTo) {
 
   const commentContentP = postDiv.querySelector('.comment-content p');
 
-  if (replyingTo) {
-    commentContentP.innerHTML = `<strong class="replying-to">@${replyingTo}</strong>`;
-  } else {
-    commentContentP.innerText = textValue;
-  }
+  commentContentP.innerText = textValue;
+  commentContentP.innerHTML = processCommentText(commentContentP.innerText);
 
   return postDiv;
 }
 
-export function newReplyComment(replyingTo, firstReply) {
+export function newReplyComment(replyingTo, isfirstReply) {
   const containerDiv = document.createElement('div');
   containerDiv.classList.add('hero-container', 'form-container');
 
@@ -101,7 +98,7 @@ export function newReplyComment(replyingTo, firstReply) {
   const textArea = containerDiv.querySelector('.form__txtarea');
   textArea.value = `@${replyingTo} `;
 
-  if (firstReply) {
+  if (isfirstReply) {
     const repliesSection = document.createElement('section');
 
     repliesSection.classList.add('replies');
@@ -110,4 +107,12 @@ export function newReplyComment(replyingTo, firstReply) {
   }
 
   return { containerDiv, textArea };
+}
+
+function processCommentText(text) {
+  const regex = /(^|[^\w@/\!?=&])@(\w{1,15})\b/g;
+  const replace = '$1<strong class="replying-to">@$2</strong>';
+
+  text = text.replace(regex, replace);
+  return text;
 }

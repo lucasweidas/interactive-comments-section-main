@@ -46,21 +46,19 @@ allCommentCon.addEventListener('submit', evt => {
 
   const postCon = getPostContainer(evt);
   const repliesCon = postCon.querySelector('.replies');
-  
+
   // Post Reply Button
   const isPostReplyBtn = evt.submitter.dataset.postReply;
   if (isPostReplyBtn !== undefined) {
-    // console.log(evt);
-    // console.log(evt.submitter);
-
     const formCon = [...repliesCon.children].find(ele => ele.matches('.form-container'));
     const textArea = formCon.querySelector('.form__txtarea');
+    // const text = "@RayFranco is answering to @AnPel, this is a real '@username83' but this is an@email.com, and this is a @probablyfaketwitterusername";
 
     (async () => {
       const allData = await data.getCurrentUserData();
-      const postContainer = form.newPostComment(allData.currentUser, textArea.value, );
-      allCommentCon.appendChild(postContainer);
-      textArea.value = '';
+      const postContainer = form.newPostComment(allData.currentUser, textArea.value);
+      repliesCon.removeChild(formCon);
+      repliesCon.appendChild(postContainer);
     })();
     return;
   }
