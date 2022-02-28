@@ -5,12 +5,25 @@ import * as event from './modules/event.js';
 const allCommentCon = document.querySelector('#comments-con');
 const formPost = document.querySelector('#form-post');
 const deleteCommentCon = document.querySelector('.del-comment-con');
-const del = {},
-  post = {};
+const del = {};
+const post = {};
 
 function getPostContainer(evt) {
-  return evt.target.parentElement.parentElement.parentElement;
+  // return evt.target.parentElement.parentElement.parentElement;
+  return evt.target.closest('.post-con');
 }
+
+// const currentUserData = (async () => {
+//   return await data.getCurrentUserData();
+// })();
+
+// document.addEventListener('DOMContentLoaded', () => {
+//   if ('content' in document.createElement('template')) {
+//     console.log('sim');
+//   } else {
+//     console.log('não');
+//   }
+// });
 
 allCommentCon.addEventListener('click', evt => {
   // Delete Button
@@ -24,39 +37,46 @@ allCommentCon.addEventListener('click', evt => {
   // Reply Button
   const isReplyBtn = evt.target.classList.contains('options__reply-btn');
   if (isReplyBtn) {
-    const postCon = getPostContainer(evt);
-    const repliesCon = postCon.querySelector('.replies');
-    const replyingTo = postCon.querySelector('.user-text__name').innerText;
+    const postContainer = getPostContainer(evt);
+    const repliesCon = postContainer.querySelector('.replies');
+    const replyingTo = postContainer.querySelector('.user-text__name').innerText;
 
     if (repliesCon == null) {
-      post.reply = form.newReplyComment(replyingTo, true);
-      return postCon.appendChild(post.reply.repliesSection);
+      (async () => {
+        const userData = await data.getCurrentUserData();
+        post.reply = form.addFormReplyComment(userData, replyingTo, true);
+        postContainer.appendChild(post.reply.repliesSection);
+      })();
+      return;
     }
 
     const hasForm = [...repliesCon.children].find(ele => ele.matches('.form-container'));
     if (hasForm) return;
 
-    post.reply = form.newReplyComment(replyingTo, false);
-    return repliesCon.appendChild(post.reply.containerDiv);
+    (async () => {
+      const userData = await data.getCurrentUserData();
+      post.reply = form.addFormReplyComment(userData, replyingTo, false);
+      repliesCon.appendChild(post.reply.formReplyClone);
+    })();
+    return;
   }
 });
 
 allCommentCon.addEventListener('submit', evt => {
   evt.preventDefault();
 
-  const postCon = getPostContainer(evt);
-  const repliesCon = postCon.querySelector('.replies');
+  const postContainer = getPostContainer(evt);
+  const repliesCon = postContainer.querySelector('.replies');
 
   // Post Reply Button
   const isPostReplyBtn = evt.submitter.dataset.postReply;
   if (isPostReplyBtn !== undefined) {
     const formCon = [...repliesCon.children].find(ele => ele.matches('.form-container'));
     const textArea = formCon.querySelector('.form__txtarea');
-    // const text = "@RayFranco is answering to @AnPel, this is a real '@username83' but this is an@email.com, and this is a @probablyfaketwitterusername";
 
     (async () => {
-      const allData = await data.getCurrentUserData();
-      const postContainer = form.newPostComment(allData.currentUser, textArea.value);
+      const userData = await data.getCurrentUserData();
+      const postContainer = form.newPostComment(userData, textArea.value);
       repliesCon.removeChild(formCon);
       repliesCon.appendChild(postContainer);
     })();
@@ -66,26 +86,24 @@ allCommentCon.addEventListener('submit', evt => {
   // Cancel Reply Button
   const isCancelReplyBtn = evt.submitter.dataset.cancelReply;
   if (isCancelReplyBtn !== undefined) {
-    // const postCon = getPostContainer(evt);
-    // const repliesCon = postCon.querySelector('.replies');
     const hasReplies = repliesCon.querySelector('.replies > .post-con');
 
     if (hasReplies) {
       const formCon = [...repliesCon.children].find(ele => ele.matches('.form-container'));
       return repliesCon.removeChild(formCon);
     }
-    return postCon.removeChild(repliesCon);
+    return postContainer.removeChild(repliesCon);
   }
 });
 
 formPost.addEventListener('submit', evt => {
   evt.preventDefault();
 
-  const textArea = document.querySelector('.form__txtarea');
+  const textArea = formPost.querySelector('.form__txtarea');
 
   (async () => {
-    const allData = await data.getCurrentUserData();
-    const postContainer = form.newPostComment(allData.currentUser, textArea.value);
+    const userData = await data.getCurrentUserData();
+    const postContainer = form.newPostComment(userData, textArea.value, true);
     allCommentCon.appendChild(postContainer);
     textArea.value = '';
   })();
