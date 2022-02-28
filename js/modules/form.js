@@ -49,10 +49,20 @@ export function addFormReplyComment(userData, replyingTo, isfirstReply) {
   return { formReplyClone, textArea };
 }
 
-function processCommentText(text) {
+export function processCommentText(text) {
   const regex = /(^|[^\w@/\!?=&])@(\w{1,15})\b/g;
   const replace = '$1<strong class="replying-to">@$2</strong>';
 
   text = text.replace(regex, replace);
   return text;
+}
+
+export function addEditForm(commentText) {
+  const formUpdateTemplate = document.querySelector('#form-update-template');
+  const formUpdateClone = formUpdateTemplate.content.cloneNode(true);
+  const textArea = formUpdateClone.querySelector('.form__txtarea');
+
+  textArea.value = commentText;
+  
+  return formUpdateClone;
 }

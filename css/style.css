@@ -313,6 +313,15 @@ svg {
   grid-area: user-avatar;
 }
 
+.form-update {
+  grid-auto-columns: 1fr 1fr !important;
+  grid-template-areas: 'textarea' 'form-buttons' !important;
+}
+
+.form-update .form-buttons {
+  flex-flow: row-reverse nowrap !important;
+}
+
 /*******************************************/
 /* Delete Comment Container */
 .del-comment-con {
@@ -362,7 +371,7 @@ svg {
 }
 
 #cancel-del-comment,
-[data-cancel-reply] {
+.form__cancel-btn {
   background-color: var(--grayish-blue);
 }
 

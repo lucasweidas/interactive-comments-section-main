@@ -432,17 +432,29 @@
     <!-- ******************************* -->
     <template id="form-reply-template">
       <div class="hero-container form-container">
-        <form id="form-post" class="form form-reply">
+        <form class="form form-reply">
           <textarea class="form__txtarea" placeholder="Add a comment..."></textarea>
           <div class="form-buttons">
             <button type="submit" class="form__button btn--hover" data-post-reply>Reply</button>
-            <button class="form__button btn--hover" data-cancel-reply>Cancel</button>
+            <button class="form__button form__cancel-btn btn--hover" data-cancel-reply>Cancel</button>
           </div>
           <div class="form-avatar">
             <picture>
               <source srcset="" type="image/png" class="backup-avatar" />
               <img src="" alt="" class="user__avatar" />
             </picture>
+          </div>
+        </form>
+      </div>
+    </template>
+
+    <template id="form-update-template">
+      <div class="form-container">
+        <form class="form form-update">
+          <textarea class="form__txtarea" placeholder="Add a comment..."></textarea>
+          <div class="form-buttons">
+            <button type="submit" class="form__button btn--hover" data-post-update>Update</button>
+            <button class="form__button form__cancel-btn btn--hover" data-cancel-update>Cancel</button>
           </div>
         </form>
       </div>
