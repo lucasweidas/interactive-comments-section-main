@@ -274,7 +274,7 @@
                       />
                     </svg>
                   </button>
-                  <p class="rate__score">2</p>
+                  <p class="rate__score" data-rate-score="2">2</p>
                   <button class="rate__button down-vote-btn" title="Down vote">
                     <svg width="11" height="3" xmlns="http://www.w3.org/2000/svg">
                       <path
@@ -322,7 +322,9 @@
       <!-- Form Container -->
       <div class="hero-container">
         <form id="form-post" class="form">
-          <textarea class="form__txtarea" placeholder="Add a comment..."></textarea>
+          <div class="textarea-con">
+            <textarea class="form__txtarea" placeholder="Add a comment..."></textarea>
+          </div>
           <div class="form-buttons">
             <button type="submit" class="form__button btn--hover">Send</button>
           </div>
@@ -382,7 +384,7 @@
                 />
               </svg>
             </button>
-            <p class="rate__score">0</p>
+            <p class="rate__score" data-rate-score="0">0</p>
             <button class="rate__button down-vote-btn" title="Down vote">
               <svg width="11" height="3" xmlns="http://www.w3.org/2000/svg">
                 <path
@@ -433,7 +435,9 @@
     <template id="form-reply-template">
       <div class="hero-container form-container">
         <form class="form form-reply">
-          <textarea class="form__txtarea" placeholder="Add a comment..."></textarea>
+          <div class="textarea-con">
+            <textarea class="form__txtarea" placeholder="Add a comment..."></textarea>
+          </div>
           <div class="form-buttons">
             <button type="submit" class="form__button btn--hover" data-post-reply>Reply</button>
             <button class="form__button form__cancel-btn btn--hover" data-cancel-reply>Cancel</button>
@@ -451,7 +455,9 @@
     <template id="form-update-template">
       <div class="form-container">
         <form class="form form-update">
-          <textarea class="form__txtarea" placeholder="Add a comment..."></textarea>
+          <div class="textarea-con">
+            <textarea class="form__txtarea" placeholder="Add a comment..."></textarea>
+          </div>
           <div class="form-buttons">
             <button type="submit" class="form__button btn--hover" data-post-update>Update</button>
             <button class="form__button form__cancel-btn btn--hover" data-cancel-update>Cancel</button>

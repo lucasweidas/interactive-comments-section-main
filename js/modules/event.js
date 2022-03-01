@@ -11,27 +11,30 @@ function getDirectChild(element, selector) {
   return [...element.children].find(ele => ele.matches(selector));
 }
 
+// Will create a NEW comment and add it to the root of the comments container
 export async function createNewPostComment(evt) {
   const allCommentCon = document.querySelector('#comments-con');
   const textArea = evt.currentTarget.querySelector('.form__txtarea');
   const userData = await data.getCurrentUserData();
-  const postContainer = form.newPostComment(userData, textArea.value, true);
+  const postContainer = form.newComment(userData, textArea.value);
 
   allCommentCon.appendChild(postContainer);
   textArea.value = '';
 }
 
+// It will create and add a new reply comment to the comment and remove the "reply form"
 export async function createNewReplyComment(evt) {
   const repliesCon = getPostContainer(evt).querySelector('.replies');
   const formCon = [...repliesCon.children].find(ele => ele.matches('.form-container'));
   const textArea = formCon.querySelector('.form__txtarea');
   const userData = await data.getCurrentUserData();
-  const postContainer = form.newPostComment(userData, textArea.value);
+  const postContainer = form.newComment(userData, textArea.value);
 
   repliesCon.removeChild(formCon);
   repliesCon.appendChild(postContainer);
 }
 
+// Will remove the "reply form" and the reply comment will not be saved
 export function cancelNewReplyComment(evt) {
   const postContainer = getPostContainer(evt);
   const repliesCon = postContainer.querySelector('.replies');
@@ -47,6 +50,7 @@ export function cancelNewReplyComment(evt) {
   postContainer.removeChild(repliesCon);
 }
 
+// Will change the previous comment text to the new text and remove the "edit form"
 export function postUpdatedComment(evt) {
   const commentContentCon = getPostContainer(evt).querySelector('.comment-content');
   const formUpdate = commentContentCon.querySelector('.form-container');
@@ -56,18 +60,20 @@ export function postUpdatedComment(evt) {
 
   commentParagraph.innerHTML = newCommentText;
   commentContentCon.removeChild(formUpdate);
-  commentParagraph.style.display = 'block';
+  commentParagraph.classList.remove('hide');
 }
 
+// Will remove the "edit form" and discard all changes to the comment text
 export function cancelUpdateComment(evt) {
   const commentContentCon = getPostContainer(evt).querySelector('.comment-content');
   const formUpdate = commentContentCon.querySelector('.form-container');
   const commentParagraph = commentContentCon.querySelector('p');
 
   commentContentCon.removeChild(formUpdate);
-  commentParagraph.style.display = 'block';
+  commentParagraph.classList.remove('hide');
 }
 
+// Will add a "edit form" if the comment does not already have one
 export function createNewEditForm(evt) {
   const commentContentCon = getPostContainer(evt).querySelector('.comment-content');
   // If the Comment Content Container does not have an Edit Form
@@ -76,11 +82,14 @@ export function createNewEditForm(evt) {
     const commentText = commentParagraph.innerText;
     const updateFormCon = form.addEditForm(commentText);
 
-    commentParagraph.style.display = 'none';
+    // commentParagraph.style.display = 'none';
+    commentParagraph.classList.add('hide');
     commentContentCon.appendChild(updateFormCon);
   }
 }
 
+// Will add a "reply form" if the comment does not already have one
+// And if comment does not have a replies section, it will add one
 export async function createNewReplyForm(evt) {
   const postContainer = getPostContainer(evt);
   const repliesCon = postContainer.querySelector('.replies');
@@ -100,20 +109,23 @@ export async function createNewReplyForm(evt) {
   }
 }
 
-export function registerUpVote(evt) {
+// This will register both "Up" or "Down" Votes
+export function registerVote(evt, isUpVote) {
   const rateCon = evt.target.closest('.rate');
-  const rateScoreCon = rateCon.querySelector('.rate__score');
-  const actualScore = parseInt(rateScoreCon.innerText);
-  
-  rateScoreCon.innerText = actualScore + 1;
+  const rateScore = rateCon.querySelector('.rate__score');
+  let actualScore = parseInt(rateScore.dataset.rateScore);
+
+  // Setting the new "integer" value for the attribute [data-rate-score]
+  rateScore.dataset.rateScore = isUpVote ? ++actualScore : --actualScore;
+  // Setting the new formated value that will be displayed
+  rateScore.innerText = Intl.NumberFormat('en-US', {
+    notation: 'compact',
+    maximumFractionDigits: 1,
+    compactDisplay: 'short',
+  }).format(actualScore);
 }
 
-export function registerDownVote(evt) {
-  const rateCon = evt.target.closest('.rate');
-  const rateScoreCon = rateCon.querySelector('.rate__score');
-  const actualScore = parseInt(rateScoreCon.innerText);
-  
-  if (actualScore > 0) {
-    rateScoreCon.innerText = actualScore - 1;
-  }
+export async function loadComment() {
+  const userData = await data.getCurrentUserData();
+  form.loadCreatedComment(userData, '@cudecavalo mama minha pica!');
 }

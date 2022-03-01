@@ -5,6 +5,10 @@ const formPost = document.querySelector('#form-post');
 const deleteCommentCon = document.querySelector('.del-comment-con');
 const del = {};
 
+document.addEventListener('DOMContentLoaded', () => {
+  event.loadComment();
+});
+
 // Will be called if any clicks occur within it
 allCommentCon.addEventListener('click', evt => {
   const isDeleteBtn = evt.target.matches('.options__del-btn');
@@ -24,10 +28,10 @@ allCommentCon.addEventListener('click', evt => {
   if (isReplyBtn) return event.createNewReplyForm(evt);
 
   const isUpVoteBtn = evt.target.matches('.up-vote-btn');
-  if (isUpVoteBtn) return event.registerUpVote(evt);
+  if (isUpVoteBtn) return event.registerVote(evt, true);
 
   const isDownVoteBtn = evt.target.matches('.down-vote-btn');
-  if (isDownVoteBtn) return event.registerDownVote(evt);
+  if (isDownVoteBtn) return event.registerVote(evt, false);
 });
 
 // It will be called if any FORM within it is "submitted"
