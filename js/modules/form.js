@@ -38,15 +38,17 @@ export function addFormReplyComment(userData, replyingTo, isfirstReply) {
   userAvatarImg.src = userData.image.webp;
   userAvatarImg.alt = userData.username;
 
+  // If it is the first Reply Comment of the Post Comment
   if (isfirstReply) {
     const repliesSection = document.createElement('section');
 
     repliesSection.classList.add('replies');
     repliesSection.appendChild(formReplyClone);
-    return { repliesSection, textArea };
+    return repliesSection;
   }
 
-  return { formReplyClone, textArea };
+  // If it is just another Reply Comment to the Post Comment
+  return formReplyClone;
 }
 
 export function processCommentText(text) {
@@ -63,6 +65,5 @@ export function addEditForm(commentText) {
   const textArea = formUpdateClone.querySelector('.form__txtarea');
 
   textArea.value = commentText;
-  
   return formUpdateClone;
 }
