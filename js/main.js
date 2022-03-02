@@ -6,7 +6,7 @@ const deleteCommentCon = document.querySelector('.del-comment-con');
 const del = {};
 
 document.addEventListener('DOMContentLoaded', () => {
-  event.loadComment();
+  event.loadComments();
 });
 
 // Will be called if any clicks occur within it

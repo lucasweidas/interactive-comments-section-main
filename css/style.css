@@ -80,8 +80,8 @@ svg {
   pointer-events: none;
 }
 
-.hide {
-  display: none;
+.hidden {
+  display: none !important;
 }
 
 /*******************************************/
