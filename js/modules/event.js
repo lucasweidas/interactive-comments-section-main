@@ -11,6 +11,14 @@ function getDirectChild(element, selector) {
   return [...element.children].find(child => child.matches(selector));
 }
 
+function getRepliesSection(postCon) {
+  const repliesCon = postCon.querySelector('.replies');
+  if (repliesCon === null) {
+    return postCon.closest('.replies');
+  }
+  return repliesCon;
+}
+
 // Will create a NEW comment and add it to the root of the comments container
 export async function createNewPostComment(evt) {
   const allCommentCon = document.querySelector('#comments-con');
@@ -24,24 +32,25 @@ export async function createNewPostComment(evt) {
 
 // It will create and add a new reply comment to the comment and remove the "reply form"
 export async function createNewReplyComment(evt) {
-  const repliesCon = getPostContainer(evt).querySelector('.replies');
-  const formCon = [...repliesCon.children].find(ele => ele.matches('.form-container'));
+  const postContainer = getPostContainer(evt);
+  const repliesCon = getRepliesSection(postContainer);
+  const formCon = getDirectChild(postContainer, '.form-container');
   const textArea = formCon.querySelector('.form__txtarea');
   const userData = await data.getCurrentUserData();
-  const postContainer = form.newComment(userData, textArea.value);
+  const newPostContainer = form.newComment(userData, textArea.value);
 
-  repliesCon.removeChild(formCon);
-  repliesCon.appendChild(postContainer);
+  postContainer.removeChild(formCon);
+  repliesCon.appendChild(newPostContainer);
+  repliesCon.classList.remove('hidden');
 }
 
 // Will remove the "reply form" and the reply comment will not be saved
 export function cancelNewReplyComment(evt) {
   const postContainer = getPostContainer(evt);
-  const repliesCon = postContainer.querySelector('.replies');
-  const formCon = getDirectChild(repliesCon, '.form-container');
+  const repliesCon = getRepliesSection(postContainer);
+  const formCon = getDirectChild(postContainer, '.form-container');
 
-  repliesCon.removeChild(formCon);
-
+  postContainer.removeChild(formCon);
   // If the Replies Section has no children, hide it
   if (repliesCon.children.length === 0) repliesCon.classList.add('hidden');
 }
@@ -92,11 +101,10 @@ export async function createNewReplyForm(evt) {
   const userData = await data.getCurrentUserData();
 
   // If the Replies Section does not have an Reply Form
-  if (getDirectChild(repliesCon, '.form-container') === undefined) {
+  if (getDirectChild(postContainer, '.form-container') === undefined) {
     const formReplyClone = form.addFormReplyComment(userData, replyingTo);
 
-    repliesCon.appendChild(formReplyClone);
-    repliesCon.classList.remove('hidden');
+    postContainer.insertBefore(formReplyClone, repliesCon);
   }
 }
 
@@ -113,18 +121,20 @@ export function registerVote(evt, isUpVote) {
 }
 
 export async function loadComments() {
-  const allCommentCon = document.querySelector('#comments-con');
-  const userData = await data.getCurrentUserData();
-  const commentsData = await data.getCommentsData();
-
   // If "localStorage" doesn't have any data about "currentUser" and "commnets", then create it
   if (!localStorage.getItem('currentUser') && !localStorage.getItem('comments')) {
+    const userData = await data.getCurrentUserData();
+    const commentsData = await data.getCommentsData();
     createLocalStorage(userData, commentsData);
   }
 
+  const allCommentCon = document.querySelector('#comments-con');
+  const userData = JSON.parse(localStorage.getItem('currentUser'));
+  const commentsData = JSON.parse(localStorage.getItem('comments'));
+
   commentsData.forEach(commentData => {
-    const parent = form.loadCreatedComments(userData, commentData);
-    const repliesCon = parent.querySelector('.replies');
+    const postContainer = form.loadCreatedComments(userData, commentData);
+    const repliesCon = postContainer.querySelector('.replies');
 
     if (commentData.replies.length > 0) {
       commentData.replies.forEach(replyData => {
@@ -132,13 +142,13 @@ export async function loadComments() {
       });
       repliesCon.classList.remove('hidden');
     }
-
-    allCommentCon.appendChild(parent);
+    allCommentCon.appendChild(postContainer);
   });
 }
 
 // Will create a new space and store the datas on the "localStorage"
 function createLocalStorage(userData, commentsData) {
   localStorage.setItem('currentUser', JSON.stringify(userData));
+  localStorage.setItem('availableId', 5);
   localStorage.setItem('comments', JSON.stringify(commentsData));
 }

@@ -43,7 +43,9 @@ export function newComment(userData, textValue) {
   const commentContentP = postClone.querySelector('.comment-content p');
   const optionsDiv = postClone.querySelector('.options');
   const btnReply = postClone.querySelector('.options__reply-btn');
+  const idValue = parseInt(localStorage.getItem('availableId'));
 
+  localStorage.setItem('availableId', idValue + 1);
   postDiv.setAttribute('data-logged-user', '');
   postDiv.setAttribute('data-created-at', creationTime);
   userNameh2.innerHTML = `${userData.username} <span class="user__mark">you</span>`;
