@@ -235,15 +235,6 @@ svg {
   color: var(--moderate-blue);
 }
 
-[data-logged-user] > .comment .options__reply-btn {
-  display: none;
-}
-
-:not([data-logged-user]) > .comment .options__del-btn,
-:not([data-logged-user]) > .comment .options__edit-btn {
-  display: none;
-}
-
 /*******************************************/
 /* Post - Replies Section */
 .replies {

@@ -19,6 +19,10 @@ function getRepliesSection(postCon) {
   return repliesCon;
 }
 
+function getCommentId(element) {
+  return element.closest('.post-con').dataset.commentId;
+}
+
 // Will create a NEW comment and add it to the root of the comments container
 export async function createNewPostComment(evt) {
   const allCommentCon = document.querySelector('#comments-con');
@@ -34,10 +38,11 @@ export async function createNewPostComment(evt) {
 export async function createNewReplyComment(evt) {
   const postContainer = getPostContainer(evt);
   const repliesCon = getRepliesSection(postContainer);
+  const commentId = getCommentId(repliesCon);
   const formCon = getDirectChild(postContainer, '.form-container');
   const textArea = formCon.querySelector('.form__txtarea');
   const userData = await data.getCurrentUserData();
-  const newPostContainer = form.newComment(userData, textArea.value);
+  const newPostContainer = form.newComment(userData, textArea.value, commentId);
 
   postContainer.removeChild(formCon);
   repliesCon.appendChild(newPostContainer);
@@ -57,12 +62,15 @@ export function cancelNewReplyComment(evt) {
 
 // Will change the previous comment text to the new text and remove the "edit form"
 export function postUpdatedComment(evt) {
-  const commentContentCon = getPostContainer(evt).querySelector('.comment-content');
+  const postContainer = getPostContainer(evt);
+  const commentId = postContainer.dataset.commentId;
+  const commentContentCon = postContainer.querySelector('.comment-content');
   const formUpdate = commentContentCon.querySelector('.form-container');
   const commentParagraph = commentContentCon.querySelector('p');
   const textareaValue = formUpdate.querySelector('.form__txtarea').value;
   const newCommentText = form.processCommentText(textareaValue);
 
+  form.saveUpdatedComment(commentId, textareaValue);
   commentParagraph.innerHTML = newCommentText;
   commentContentCon.removeChild(formUpdate);
   commentParagraph.classList.remove('hidden');
@@ -110,14 +118,18 @@ export async function createNewReplyForm(evt) {
 
 // This will register both "Up" or "Down" Votes
 export function registerVote(evt, isUpVote) {
+  const comments = data.getComments();
+  const correctComment = getCorrectComment(comments, getCommentId(evt.target));
   const rateCon = evt.target.closest('.rate');
   const rateScore = rateCon.querySelector('.rate__score');
-  let actualScore = parseInt(rateScore.dataset.rateScore);
+  let actualScore = parseInt(correctComment.score);
 
-  // Setting the new "integer" value for the attribute [data-rate-score]
-  rateScore.dataset.rateScore = isUpVote ? ++actualScore : --actualScore;
-  // Setting the new formated value that will be displayed
-  rateScore.innerText = form.formatCommentScore(actualScore);
+  // Set the new score value for the comment and save it
+  correctComment.score = isUpVote ? ++actualScore : --actualScore;
+  localStorage.setItem('comments', JSON.stringify(comments));
+
+  // Sets the new formatted score value that will be displayed
+  rateScore.innerText = form.formatCommentScore(correctComment.score);
 }
 
 export async function loadComments() {
@@ -151,4 +163,20 @@ function createLocalStorage(userData, commentsData) {
   localStorage.setItem('currentUser', JSON.stringify(userData));
   localStorage.setItem('availableId', 5);
   localStorage.setItem('comments', JSON.stringify(commentsData));
+}
+
+function getCorrectComment(comments, commentId) {
+  let correctComment;
+
+  comments.forEach(comment => {
+    if (comment.id == commentId) {
+      correctComment = comment;
+    }
+    comment.replies.forEach(reply => {
+      if (reply.id == commentId) {
+        correctComment = reply;
+      }
+    });
+  });
+  return correctComment;
 }

@@ -9,3 +9,7 @@ export async function getCommentsData() {
   const data = await response.json();
   return data.comments;
 }
+
+export function getComments() {
+  return JSON.parse(localStorage.getItem('comments'));
+}

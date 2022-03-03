@@ -1,3 +1,5 @@
+import * as data from './data.js';
+
 function formatCreationTime(date) {
   const seconds = Math.floor((new Date() - date) / 1000);
 
@@ -20,6 +22,48 @@ function formatCreationTime(date) {
   if (interval === 0) return 'today';
 }
 
+function getReplyingTo(text) {
+  const regex = /(^|[^\w@/\!?=&])@(\w{1,15})\b/;
+  return regex.exec(text);
+}
+
+function saveCommentOrReply(commentId, commentObj, text) {
+  const comments = data.getComments();
+
+  if (commentId !== undefined) {
+    delete commentObj.replies;
+    const replyingObj = getReplyingTo(text);
+
+    commentObj.replyingTo = replyingObj === null ? '' : replyingObj['2'];
+    comments.forEach(comment => {
+      if (comment.id == commentId) comment.replies.push(commentObj);
+    });
+  } else {
+    comments.push(commentObj);
+  }
+
+  localStorage.setItem('comments', JSON.stringify(comments));
+}
+
+export function saveUpdatedComment(commentId, text) {
+  const comments = data.getComments();
+
+  comments.forEach(comment => {
+    if (comment.id == commentId) {
+      return (comment.content = text);
+    }
+    comment.replies.forEach(reply => {
+      if (reply.id == commentId) {
+        reply.content = text;
+        const replyingObj = getReplyingTo(text);
+        return (reply.replyingTo = replyingObj === null ? '' : replyingObj['2']);
+      }
+    });
+  });
+
+  localStorage.setItem('comments', JSON.stringify(comments));
+}
+
 export function formatCommentScore(actualScore) {
   return Intl.NumberFormat('en-US', {
     notation: 'compact',
@@ -29,12 +73,12 @@ export function formatCommentScore(actualScore) {
 }
 
 // Will create a NEW comment or REPLY comment
-export function newComment(userData, textValue) {
+export function newComment(userData, textValue, commentId) {
   const creationTime = new Date().getTime();
   const postTemplate = document.querySelector('#post-con-template');
-  const optionsBtnsTemplate = document.querySelector('#logged-user-btns-template');
+  const userBtnsTemplate = document.querySelector('#logged-user-btns-template');
   const postClone = postTemplate.content.cloneNode(true);
-  const optionsBtnsClone = optionsBtnsTemplate.content.cloneNode(true);
+  const userBtnsClone = userBtnsTemplate.content.cloneNode(true);
   const postDiv = postClone.querySelector('.post-con');
   const userNameh2 = postClone.querySelector('.user-text__name');
   const commentedP = postClone.querySelector('.user-text__commented');
@@ -42,11 +86,26 @@ export function newComment(userData, textValue) {
   const userAvatarImg = postClone.querySelector('.user__avatar');
   const commentContentP = postClone.querySelector('.comment-content p');
   const optionsDiv = postClone.querySelector('.options');
-  const btnReply = postClone.querySelector('.options__reply-btn');
   const idValue = parseInt(localStorage.getItem('availableId'));
+  // Creating the comment Object that will be saved to localStorage
+  const commentObj = {
+    id: idValue,
+    content: textValue,
+    createdAt: creationTime,
+    score: 0,
+    user: {
+      image: {
+        png: userData.image.png,
+        webp: userData.image.webp,
+      },
+      username: userData.username,
+    },
+    replies: [],
+  };
 
+  saveCommentOrReply(commentId, commentObj, textValue);
   localStorage.setItem('availableId', idValue + 1);
-  postDiv.setAttribute('data-logged-user', '');
+  postDiv.setAttribute('data-comment-id', idValue);
   postDiv.setAttribute('data-created-at', creationTime);
   userNameh2.innerHTML = `${userData.username} <span class="user__mark">you</span>`;
   commentedP.innerText = formatCreationTime(creationTime);
@@ -54,8 +113,7 @@ export function newComment(userData, textValue) {
   userAvatarImg.src = userData.image.webp;
   userAvatarImg.alt = userData.username;
   commentContentP.innerHTML = processCommentText(textValue);
-  optionsDiv.removeChild(btnReply);
-  optionsDiv.appendChild(optionsBtnsClone);
+  optionsDiv.appendChild(userBtnsClone);
   // Returns the Comment Post Container
   return postClone;
 }
@@ -78,9 +136,9 @@ export function addFormReplyComment(userData, replyingTo) {
 
 // It will process the comment text and add tag to all valid "@" mentions
 export function processCommentText(text) {
-  const regex = /(^|[^\w@/\!?=&])@(\w{1,15})\b/g;
+  // const regex = /(^|[^\w@/\!?=&])@(\w{1,15})\b/g;
+  const regex = /(^|[^\w@/\!?=&])@(\w{1,15})\b/;
   const replace = '$1<strong class="replying-to">@$2</strong>';
-
   return text.replace(regex, replace);
 }
 
@@ -105,6 +163,7 @@ export function loadCreatedComments(userData, commentData, isReply) {
   const userAvatarImg = postClone.querySelector('.user__avatar');
   const commentContentP = postClone.querySelector('.comment-content p');
   const rateScoreP = postClone.querySelector('.rate__score');
+  const optionsDiv = postClone.querySelector('.options');
   const creationTime = commentData.createdAt;
 
   postDiv.setAttribute('data-comment-id', commentData.id);
@@ -119,7 +178,11 @@ export function loadCreatedComments(userData, commentData, isReply) {
 
   // If the comment was made by the currently logged user
   if (isDeepEqual(userData, commentData.user)) {
-    setLoggedButtons(postClone, postDiv, userNameh2);
+    setLoggedButtons(userNameh2, optionsDiv);
+  } else {
+    const replyBtnTemplate = document.querySelector('#reply-btn-template');
+    const replyBtnClone = replyBtnTemplate.content.cloneNode(true);
+    optionsDiv.appendChild(replyBtnClone);
   }
 
   // If it is a reply comment, remove your replies section
@@ -131,22 +194,20 @@ export function loadCreatedComments(userData, commentData, isReply) {
 }
 
 // Will set all buttons specific to the current user
-function setLoggedButtons(postClone, postDiv, userNameh2) {
-  const optionsBtnsTemplate = document.querySelector('#logged-user-btns-template');
-  const optionsBtnsClone = optionsBtnsTemplate.content.cloneNode(true);
-  const optionsDiv = postClone.querySelector('.options');
-  const btnReply = postClone.querySelector('.options__reply-btn');
+function setLoggedButtons(userNameh2, optionsDiv) {
+  const userBtnsTemplate = document.querySelector('#logged-user-btns-template');
+  const userBtnsClone = userBtnsTemplate.content.cloneNode(true);
   const userMarkSpan = document.createElement('span');
 
-  postDiv.setAttribute('data-logged-user', '');
   userMarkSpan.classList.add('user__mark');
   userMarkSpan.innerText = 'you';
   userNameh2.appendChild(userMarkSpan);
-  optionsDiv.removeChild(btnReply);
-  optionsDiv.appendChild(optionsBtnsClone);
+  optionsDiv.appendChild(userBtnsClone);
 }
 
 // Will check if the comment was made by the current user
+// All this is needed because of how JavaScript Objects works
+// It will check if the "value" of both keys are equal
 function isDeepEqual(currentUser, commentUser) {
   const userKeys = Object.keys(currentUser);
 
@@ -159,7 +220,6 @@ function isDeepEqual(currentUser, commentUser) {
       return false;
     }
   }
-
   return true;
 }
 
