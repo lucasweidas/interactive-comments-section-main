@@ -70,7 +70,13 @@ deleteCommentCon.addEventListener('click', evt => {
 
   // If it is the Button Confirm Delete Comment
   if (evt.target.id === 'confirm-del-comment') {
+    event.deleteComment(del.postCon);
     del.postConParent.removeChild(del.postCon);
+    const containerLength = del.postConParent.children.length;
+
+    if (del.postConParent.matches('.replies') && containerLength === 0) {
+      del.postConParent.classList.add('hidden');
+    }
     return deleteCommentCon.classList.remove('active');
   }
 });

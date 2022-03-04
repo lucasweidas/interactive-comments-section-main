@@ -106,8 +106,8 @@ export function newComment(userData, textValue, commentId) {
   saveCommentOrReply(commentId, commentObj, textValue);
   localStorage.setItem('availableId', idValue + 1);
   postDiv.setAttribute('data-comment-id', idValue);
-  postDiv.setAttribute('data-created-at', creationTime);
-  userNameh2.innerHTML = `${userData.username} <span class="user__mark">you</span>`;
+  userNameh2.innerText = userData.username;
+  userNameh2.insertAdjacentHTML('beforeend', '<span class="user__mark">you</span>');
   commentedP.innerText = formatCreationTime(creationTime);
   sourceElement.srcset = userData.image.png;
   userAvatarImg.src = userData.image.webp;
@@ -152,7 +152,6 @@ export function addEditForm(commentText) {
   return formUpdateClone;
 }
 
-/* ***************** TESTS ******************** */
 export function loadCreatedComments(userData, commentData, isReply) {
   const postTemplate = document.querySelector('#post-con-template');
   const postClone = postTemplate.content.cloneNode(true);
@@ -174,14 +173,18 @@ export function loadCreatedComments(userData, commentData, isReply) {
   userAvatarImg.alt = commentData.user.username;
   commentContentP.innerHTML = processCommentText(commentData.content);
   rateScoreP.innerText = formatCommentScore(commentData.score);
-  rateScoreP.dataset.rateScore = commentData.score;
 
   // If the comment was made by the currently logged user
   if (isDeepEqual(userData, commentData.user)) {
-    setLoggedButtons(userNameh2, optionsDiv);
+    const userBtnsTemplate = document.querySelector('#logged-user-btns-template');
+    const userBtnsClone = userBtnsTemplate.content.cloneNode(true);
+
+    userNameh2.insertAdjacentHTML('beforeend', '<span class="user__mark">you</span>');
+    optionsDiv.appendChild(userBtnsClone);
   } else {
     const replyBtnTemplate = document.querySelector('#reply-btn-template');
     const replyBtnClone = replyBtnTemplate.content.cloneNode(true);
+
     optionsDiv.appendChild(replyBtnClone);
   }
 
@@ -191,18 +194,6 @@ export function loadCreatedComments(userData, commentData, isReply) {
   }
   // Returns the Comment Post Container
   return postClone;
-}
-
-// Will set all buttons specific to the current user
-function setLoggedButtons(userNameh2, optionsDiv) {
-  const userBtnsTemplate = document.querySelector('#logged-user-btns-template');
-  const userBtnsClone = userBtnsTemplate.content.cloneNode(true);
-  const userMarkSpan = document.createElement('span');
-
-  userMarkSpan.classList.add('user__mark');
-  userMarkSpan.innerText = 'you';
-  userNameh2.appendChild(userMarkSpan);
-  optionsDiv.appendChild(userBtnsClone);
 }
 
 // Will check if the comment was made by the current user

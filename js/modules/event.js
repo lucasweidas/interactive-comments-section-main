@@ -132,6 +132,24 @@ export function registerVote(evt, isUpVote) {
   rateScore.innerText = form.formatCommentScore(correctComment.score);
 }
 
+export function deleteComment(postContainer) {
+  const comments = data.getComments();
+  const commentId = postContainer.dataset.commentId;
+
+  comments.forEach((comment, index) => {
+    if (comment.id == commentId) {
+      comments.splice(index, 1);
+    }
+    comment.replies.forEach((reply, index) => {
+      if (reply.id == commentId) {
+        comment.replies.splice(index, 1);
+      }
+    });
+  });
+
+  localStorage.setItem('comments', JSON.stringify(comments));
+}
+
 export async function loadComments() {
   // If "localStorage" doesn't have any data about "currentUser" and "commnets", then create it
   if (!localStorage.getItem('currentUser') && !localStorage.getItem('comments')) {
