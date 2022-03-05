@@ -1,4 +1,5 @@
 import * as data from './data.js';
+import * as event from './event.js';
 
 function formatCreationTime(date) {
   const seconds = Math.floor((new Date() - date) / 1000);
@@ -23,30 +24,40 @@ function formatCreationTime(date) {
 }
 
 function getReplyingTo(text) {
-  const regex = /(^|[^\w@/\!?=&])@(\w{1,15})\b/;
-  return regex.exec(text);
+  const regex = /^(^|[^\w@/\!?=&])@(\w{1,15})\b/;
+  const replyingTo = regex.exec(text.trim());
+  return replyingTo === null ? '' : replyingTo['2'];
 }
 
 function saveCommentOrReply(commentId, commentObj, text) {
   const comments = data.getComments();
+  const replyingTo = getReplyingTo(text);
+  const result = { text: text, replying: '' };
 
   if (commentId !== undefined) {
     delete commentObj.replies;
-    const replyingObj = getReplyingTo(text);
-
-    commentObj.replyingTo = replyingObj === null ? '' : replyingObj['2'];
+    commentObj.replyingTo = replyingTo;
     comments.forEach(comment => {
-      if (comment.id == commentId) comment.replies.push(commentObj);
+      if (comment.id == commentId) {
+        result.text = processCommentText(text);
+        result.replying = replyingTo;
+        commentObj.content = result.text;
+        return comment.replies.push(commentObj);
+      }
     });
   } else {
+    commentObj.content = text;
     comments.push(commentObj);
   }
 
   localStorage.setItem('comments', JSON.stringify(comments));
+  return result;
 }
 
 export function saveUpdatedComment(commentId, text) {
   const comments = data.getComments();
+  const replyingTo = getReplyingTo(text);
+  const result = { text: text, replying: '' };
 
   comments.forEach(comment => {
     if (comment.id == commentId) {
@@ -54,14 +65,16 @@ export function saveUpdatedComment(commentId, text) {
     }
     comment.replies.forEach(reply => {
       if (reply.id == commentId) {
-        reply.content = text;
-        const replyingObj = getReplyingTo(text);
-        return (reply.replyingTo = replyingObj === null ? '' : replyingObj['2']);
+        result.text = processCommentText(text);
+        reply.content = result.text;
+        result.replying = replyingTo;
+        return (reply.replyingTo = replyingTo);
       }
     });
   });
 
   localStorage.setItem('comments', JSON.stringify(comments));
+  return result;
 }
 
 export function formatCommentScore(actualScore) {
@@ -90,7 +103,7 @@ export function newComment(userData, textValue, commentId) {
   // Creating the comment Object that will be saved to localStorage
   const commentObj = {
     id: idValue,
-    content: textValue,
+    content: '',
     createdAt: creationTime,
     score: 0,
     user: {
@@ -101,9 +114,11 @@ export function newComment(userData, textValue, commentId) {
       username: userData.username,
     },
     replies: [],
+    usersUpVoted: [],
+    usersDownVoted: [],
   };
+  const { replying: replyingTo, text: text } = saveCommentOrReply(commentId, commentObj, textValue);
 
-  saveCommentOrReply(commentId, commentObj, textValue);
   localStorage.setItem('availableId', idValue + 1);
   postDiv.setAttribute('data-comment-id', idValue);
   userNameh2.innerText = userData.username;
@@ -112,7 +127,8 @@ export function newComment(userData, textValue, commentId) {
   sourceElement.srcset = userData.image.png;
   userAvatarImg.src = userData.image.webp;
   userAvatarImg.alt = userData.username;
-  commentContentP.innerHTML = processCommentText(textValue);
+  commentContentP.innerText = text;
+  if (replyingTo !== '') addReplyingToMark(commentContentP, replyingTo);
   optionsDiv.appendChild(userBtnsClone);
   // Returns the Comment Post Container
   return postClone;
@@ -135,11 +151,9 @@ export function addFormReplyComment(userData, replyingTo) {
 }
 
 // It will process the comment text and add tag to all valid "@" mentions
-export function processCommentText(text) {
-  // const regex = /(^|[^\w@/\!?=&])@(\w{1,15})\b/g;
-  const regex = /(^|[^\w@/\!?=&])@(\w{1,15})\b/;
-  const replace = '$1<strong class="replying-to">@$2</strong>';
-  return text.replace(regex, replace);
+export function processCommentText(textValue) {
+  const regex = /^(^|[^\w@/\!?=&])@(\w{1,15})\b/;
+  return textValue.replace(regex, '');
 }
 
 // Will create a new "edit form"
@@ -171,7 +185,7 @@ export function loadCreatedComments(userData, commentData, isReply) {
   sourceElement.srcset = commentData.user.image.png;
   userAvatarImg.src = commentData.user.image.webp;
   userAvatarImg.alt = commentData.user.username;
-  commentContentP.innerHTML = processCommentText(commentData.content);
+  commentContentP.innerText = commentData.content;
   rateScoreP.innerText = formatCommentScore(commentData.score);
 
   // If the comment was made by the currently logged user
@@ -188,12 +202,32 @@ export function loadCreatedComments(userData, commentData, isReply) {
     optionsDiv.appendChild(replyBtnClone);
   }
 
+  alreadyVoted: if (commentData.usersUpVoted !== undefined) {
+    // <- REMOVER DEPOIS
+    if (event.isAlreadyVoted(userData, commentData.usersUpVoted)) {
+      const upVoteBtn = postClone.querySelector('.up-vote-btn');
+      upVoteBtn.classList.add('voted');
+      break alreadyVoted;
+    }
+    if (event.isAlreadyVoted(userData, commentData.usersDownVoted)) {
+      const downVoteBtn = postClone.querySelector('.down-vote-btn');
+      downVoteBtn.classList.add('voted');
+    }
+  }
+
   // If it is a reply comment, remove your replies section
   if (isReply) {
     postDiv.removeChild(postClone.querySelector('.replies'));
+    if (commentData.replyingTo !== '') {
+      addReplyingToMark(commentContentP, commentData.replyingTo);
+    }
   }
   // Returns the Comment Post Container
   return postClone;
+}
+
+export function addReplyingToMark(element, replyingTo) {
+  element.insertAdjacentHTML('afterbegin', `<strong class="replying-to">@${replyingTo}</strong>`);
 }
 
 // Will check if the comment was made by the current user

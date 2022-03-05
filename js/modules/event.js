@@ -68,10 +68,10 @@ export function postUpdatedComment(evt) {
   const formUpdate = commentContentCon.querySelector('.form-container');
   const commentParagraph = commentContentCon.querySelector('p');
   const textareaValue = formUpdate.querySelector('.form__txtarea').value;
-  const newCommentText = form.processCommentText(textareaValue);
+  const { replying: replyingTo, text: text } = form.saveUpdatedComment(commentId, textareaValue);
 
-  form.saveUpdatedComment(commentId, textareaValue);
-  commentParagraph.innerHTML = newCommentText;
+  commentParagraph.innerText = text;
+  if (replyingTo !== '') form.addReplyingToMark(commentParagraph, replyingTo);
   commentContentCon.removeChild(formUpdate);
   commentParagraph.classList.remove('hidden');
 }
@@ -95,9 +95,11 @@ export function createNewEditForm(evt) {
     const commentParagraph = commentContentCon.querySelector('p');
     const commentText = commentParagraph.innerText;
     const updateFormCon = form.addEditForm(commentText);
+    const textArea = updateFormCon.querySelector('.form__txtarea');
 
     commentParagraph.classList.add('hidden');
     commentContentCon.appendChild(updateFormCon);
+    textArea.focus();
   }
 }
 
@@ -111,27 +113,118 @@ export async function createNewReplyForm(evt) {
   // If the Replies Section does not have an Reply Form
   if (getDirectChild(postContainer, '.form-container') === undefined) {
     const formReplyClone = form.addFormReplyComment(userData, replyingTo);
+    const textArea = formReplyClone.querySelector('.form__txtarea');
 
     postContainer.insertBefore(formReplyClone, repliesCon);
+    textArea.focus();
   }
 }
 
-// This will register both "Up" or "Down" Votes
-export function registerVote(evt, isUpVote) {
+// This will register UP votes
+export function registerUpVote(evt) {
+  const currentUser = data.getCurrentUser();
   const comments = data.getComments();
   const correctComment = getCorrectComment(comments, getCommentId(evt.target));
   const rateCon = evt.target.closest('.rate');
+  const upVoteBtn = rateCon.querySelector('.up-vote-btn');
+  const downVoteBtn = rateCon.querySelector('.down-vote-btn');
   const rateScore = rateCon.querySelector('.rate__score');
-  let actualScore = parseInt(correctComment.score);
+  const actualScore = parseInt(correctComment.score);
 
-  // Set the new score value for the comment and save it
-  correctComment.score = isUpVote ? ++actualScore : --actualScore;
+  // If the current user has already down voted, it will add "two" votes:
+  // The first vote will "reset" the user vote,
+  // and the second is to actually add the UP vote
+  if (isAlreadyVoted(currentUser, correctComment.usersDownVoted)) {
+    const position = correctComment.usersDownVoted.indexOf(currentUser.username);
+    correctComment.usersDownVoted.splice(position, 1);
+    correctComment.usersUpVoted.push(currentUser.username);
+    correctComment.score = actualScore + 2;
+    localStorage.setItem('comments', JSON.stringify(comments));
+    rateScore.innerText = form.formatCommentScore(correctComment.score);
+    downVoteBtn.classList.remove('voted');
+    upVoteBtn.classList.add('voted');
+    return;
+  }
+
+  // If the current user has already up voted, it will remove this vote
+  if (isAlreadyVoted(currentUser, correctComment.usersUpVoted)) {
+    const position = correctComment.usersUpVoted.indexOf(currentUser.username);
+    correctComment.usersUpVoted.splice(position, 1);
+    correctComment.score = actualScore - 1;
+    upVoteBtn.classList.remove('voted');
+  } else {
+    // Else, it will add one UP vote
+    const position = correctComment.usersDownVoted.indexOf(currentUser.username);
+    correctComment.usersDownVoted.splice(position, 1);
+    correctComment.usersUpVoted.push(currentUser.username);
+    correctComment.score = actualScore + 1;
+    upVoteBtn.classList.add('voted');
+  }
+
+  // Will save the new data value
   localStorage.setItem('comments', JSON.stringify(comments));
 
   // Sets the new formatted score value that will be displayed
   rateScore.innerText = form.formatCommentScore(correctComment.score);
 }
 
+// This will register DOWN votes
+export function registerDownVote(evt) {
+  const currentUser = data.getCurrentUser();
+  const comments = data.getComments();
+  const correctComment = getCorrectComment(comments, getCommentId(evt.target));
+  const rateCon = evt.target.closest('.rate');
+  const upVoteBtn = rateCon.querySelector('.up-vote-btn');
+  const downVoteBtn = rateCon.querySelector('.down-vote-btn');
+  const rateScore = rateCon.querySelector('.rate__score');
+  const actualScore = parseInt(correctComment.score);
+
+  // If the current user has already up voted, it will add "two" votes:
+  // The first vote will "reset" the user vote,
+  // and the second is to actually add the DOWN vote
+  if (isAlreadyVoted(currentUser, correctComment.usersUpVoted)) {
+    const position = correctComment.usersUpVoted.indexOf(currentUser.username);
+    correctComment.usersUpVoted.splice(position, 1);
+    correctComment.usersDownVoted.push(currentUser.username);
+    correctComment.score = actualScore - 2;
+    localStorage.setItem('comments', JSON.stringify(comments));
+    rateScore.innerText = form.formatCommentScore(correctComment.score);
+    upVoteBtn.classList.remove('voted');
+    downVoteBtn.classList.add('voted');
+    return;
+  }
+
+  // If the current user has already DOWN voted, it will remove this vote
+  if (isAlreadyVoted(currentUser, correctComment.usersDownVoted)) {
+    const position = correctComment.usersDownVoted.indexOf(currentUser.username);
+    correctComment.usersDownVoted.splice(position, 1);
+    correctComment.score = actualScore + 1;
+    downVoteBtn.classList.remove('voted');
+  } else {
+    // Else, it will add one DOWN vote
+    const position = correctComment.usersUpVoted.indexOf(currentUser.username);
+    correctComment.usersUpVoted.splice(position, 1);
+    correctComment.usersDownVoted.push(currentUser.username);
+    correctComment.score = actualScore - 1;
+    downVoteBtn.classList.add('voted');
+  }
+
+  // Will save the new data value
+  localStorage.setItem('comments', JSON.stringify(comments));
+
+  // Sets the new formatted score value that will be displayed
+  rateScore.innerText = form.formatCommentScore(correctComment.score);
+}
+
+// It will check if the current user has already voted on the comment
+export function isAlreadyVoted(currentUser, users) {
+  return users.reduce((hasVoted, user) => {
+    if (user == currentUser.username) hasVoted = true;
+    return hasVoted;
+  }, false);
+}
+
+// It will delete the comment from "localStorage"
 export function deleteComment(postContainer) {
   const comments = data.getComments();
   const commentId = postContainer.dataset.commentId;
@@ -150,6 +243,7 @@ export function deleteComment(postContainer) {
   localStorage.setItem('comments', JSON.stringify(comments));
 }
 
+// Every time the page is loaded, it will load all the needed things
 export async function loadComments() {
   // If "localStorage" doesn't have any data about "currentUser" and "commnets", then create it
   if (!localStorage.getItem('currentUser') && !localStorage.getItem('comments')) {
@@ -183,6 +277,7 @@ function createLocalStorage(userData, commentsData) {
   localStorage.setItem('comments', JSON.stringify(commentsData));
 }
 
+// It will get the correct comment from the localStorage, based on the "commentId"
 function getCorrectComment(comments, commentId) {
   let correctComment;
 

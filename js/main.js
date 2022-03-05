@@ -3,6 +3,7 @@ import * as event from './modules/event.js';
 const allCommentCon = document.querySelector('#comments-con');
 const formPost = document.querySelector('#form-post');
 const deleteCommentCon = document.querySelector('.del-comment-con');
+const menuButton = document.querySelector('#menu-btn');
 const del = {};
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -28,10 +29,10 @@ allCommentCon.addEventListener('click', evt => {
   if (isReplyBtn) return event.createNewReplyForm(evt);
 
   const isUpVoteBtn = evt.target.matches('.up-vote-btn');
-  if (isUpVoteBtn) return event.registerVote(evt, true);
+  if (isUpVoteBtn) return event.registerUpVote(evt);
 
   const isDownVoteBtn = evt.target.matches('.down-vote-btn');
-  if (isDownVoteBtn) return event.registerVote(evt, false);
+  if (isDownVoteBtn) return event.registerDownVote(evt);
 });
 
 // It will be called if any FORM within it is "submitted"
@@ -80,3 +81,8 @@ deleteCommentCon.addEventListener('click', evt => {
     return deleteCommentCon.classList.remove('active');
   }
 });
+
+menuButton.addEventListener('click', () => {
+  const header = document.querySelector('#header');
+  header.classList.toggle('active');
+})

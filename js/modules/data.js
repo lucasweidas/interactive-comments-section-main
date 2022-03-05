@@ -10,6 +10,10 @@ export async function getCommentsData() {
   return data.comments;
 }
 
+export function getCurrentUser() {
+  return JSON.parse(localStorage.getItem('currentUser'));
+}
+
 export function getComments() {
   return JSON.parse(localStorage.getItem('comments'));
 }

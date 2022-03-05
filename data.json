@@ -19,7 +19,9 @@
         },
         "username": "amyrobson"
       },
-      "replies": []
+      "replies": [],
+      "usersUpVoted": [],
+      "usersDownVoted": []
     },
     {
       "id": 2,
@@ -36,7 +38,7 @@
       "replies": [
         {
           "id": 3,
-          "content": "If you're still new, I'd recommend focusing on the fundamentals of HTML, CSS, and JS before considering React. It's very tempting to jump ahead but lay a solid foundation first.",
+          "content": " If you're still new, I'd recommend focusing on the fundamentals of HTML, CSS, and JS before considering React. It's very tempting to jump ahead but lay a solid foundation first.",
           "createdAt": "1 week ago",
           "score": 4,
           "replyingTo": "maxblagun",
@@ -46,11 +48,13 @@
               "webp": "./images/avatars/image-ramsesmiron.webp"
             },
             "username": "ramsesmiron"
-          }
+          },
+          "usersUpVoted": [],
+          "usersDownVoted": []
         },
         {
           "id": 4,
-          "content": "I couldn't agree more with this. Everything moves so fast and it always seems like everyone knows the newest library/framework. But the fundamentals are what stay constant.",
+          "content": " I couldn't agree more with this. Everything moves so fast and it always seems like everyone knows the newest library/framework. But the fundamentals are what stay constant.",
           "createdAt": "2 days ago",
           "score": 2,
           "replyingTo": "ramsesmiron",
@@ -60,9 +64,13 @@
               "webp": "./images/avatars/image-juliusomo.webp"
             },
             "username": "juliusomo"
-          }
+          },
+          "usersUpVoted": [],
+          "usersDownVoted": []
         }
-      ]
+      ],
+      "usersUpVoted": [],
+      "usersDownVoted": []
     }
   ]
 }
