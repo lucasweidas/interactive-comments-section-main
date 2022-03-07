@@ -17,3 +17,7 @@ export function getCurrentUser() {
 export function getComments() {
   return JSON.parse(localStorage.getItem('comments'));
 }
+
+export function getUsers() {
+  return JSON.parse(localStorage.getItem('users'));
+}

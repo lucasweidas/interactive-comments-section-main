@@ -1,65 +1,74 @@
 import * as event from './modules/event.js';
 
-const allCommentCon = document.querySelector('#comments-con');
-const formPost = document.querySelector('#form-post');
+const mainCon = document.querySelector('#main');
 const deleteCommentCon = document.querySelector('.del-comment-con');
-const menuButton = document.querySelector('#menu-btn');
+const headerCon = document.querySelector('#header');
 const del = {};
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+  const hasUser = localStorage.getItem('currentUser');
+  const hasUsers = localStorage.getItem('users');
+  const hasId = localStorage.getItem('availableId');
+  const hasComments = localStorage.getItem('comments');
+  // If the "LocalStorage" does not have one of the data
+  if (!hasUser && !hasUsers && !hasId && !hasComments) {
+    await event.createLocalStorage();
+  }
+  event.loadLoginCards();
   event.loadComments();
+  event.loadFormPost();
 });
 
 // Will be called if any clicks occur within it
-allCommentCon.addEventListener('click', evt => {
-  const isDeleteBtn = evt.target.matches('.options__del-btn');
+mainCon.addEventListener('click', evt => {
   // If it's a Delete Comment Button
+  const isDeleteBtn = evt.target.matches('.options__del-btn');
   if (isDeleteBtn) {
     del.postCon = evt.target.closest('.post-con');
     del.postConParent = del.postCon.parentElement;
     return deleteCommentCon.classList.add('active');
   }
 
-  const isEditBtn = evt.target.matches('.options__edit-btn');
   // If it's a Edit Comment Button
+  const isEditBtn = evt.target.matches('.options__edit-btn');
   if (isEditBtn) return event.createNewEditForm(evt);
 
-  const isReplyBtn = evt.target.matches('.options__reply-btn');
   // If it's a Reply Comment Button
+  const isReplyBtn = evt.target.matches('.options__reply-btn');
   if (isReplyBtn) return event.createNewReplyForm(evt);
 
+  // If it's a Up Vote Button
   const isUpVoteBtn = evt.target.matches('.up-vote-btn');
   if (isUpVoteBtn) return event.registerUpVote(evt);
 
+  // If it's a Down Vote Button
   const isDownVoteBtn = evt.target.matches('.down-vote-btn');
   if (isDownVoteBtn) return event.registerDownVote(evt);
 });
 
 // It will be called if any FORM within it is "submitted"
-allCommentCon.addEventListener('submit', evt => {
+mainCon.addEventListener('submit', evt => {
   evt.preventDefault();
 
-  const isPostReplyBtn = evt.submitter.hasAttribute('data-post-reply');
   // If it's a Post Reply Comment Button
+  const isPostReplyBtn = evt.submitter.hasAttribute('data-post-reply');
   if (isPostReplyBtn) return event.createNewReplyComment(evt);
 
-  const isCancelReplyBtn = evt.submitter.hasAttribute('data-cancel-reply');
   // If it's a Cancel Reply Comment Button
+  const isCancelReplyBtn = evt.submitter.hasAttribute('data-cancel-reply');
   if (isCancelReplyBtn) return event.cancelNewReplyComment(evt);
 
-  const isPostUpdateBtn = evt.submitter.hasAttribute('data-post-update');
   // If it's a Post Updated Comment Button
+  const isPostUpdateBtn = evt.submitter.hasAttribute('data-post-update');
   if (isPostUpdateBtn) return event.postUpdatedComment(evt);
 
-  const isCancelUpdateBtn = evt.submitter.hasAttribute('data-cancel-update');
   // If it's a Cancel Update Comment Button
+  const isCancelUpdateBtn = evt.submitter.hasAttribute('data-cancel-update');
   if (isCancelUpdateBtn) return event.cancelUpdateComment(evt);
-});
 
-// Form "Send" New Comment
-formPost.addEventListener('submit', evt => {
-  evt.preventDefault();
-  event.createNewPostComment(evt);
+  // If it is the Send Comment Button
+  const isSendBtn = evt.submitter.hasAttribute('data-send');
+  if (isSendBtn) return event.createNewPostComment(evt);
 });
 
 // The Confirm Delete Comment Overlay Container
@@ -82,7 +91,14 @@ deleteCommentCon.addEventListener('click', evt => {
   }
 });
 
-menuButton.addEventListener('click', () => {
-  const header = document.querySelector('#header');
-  header.classList.toggle('active');
-})
+headerCon.addEventListener('click', evt => {
+  // If it is the Menu Button
+  if (evt.target.matches('#menu-btn')) {
+    return headerCon.classList.toggle('active');
+  }
+
+  // If it is a Login Button that is "not" that of the Current User
+  if (evt.target.matches('.login:not([data-logged]) .login-button')) {
+    return event.changeCurrentUser(evt);
+  }
+});

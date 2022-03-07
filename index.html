@@ -16,82 +16,32 @@
     />
   </head>
   <body>
+    <!-- Header -->
     <header id="header">
       <div id="menu-buttons">
+        <div id="switch-theme">
+          <input type="checkbox" id="switch-input" />
+          <label for="switch-input" id="switch-label">
+            <i class="fa-solid fa-sun"></i>
+            <i class="fa-solid fa-moon"></i>
+          </label>
+        </div>
         <button id="menu-btn"></button>
       </div>
       <div id="menu-drop-down">
         <div id="drop-down-content">
           <h2>Change User</h2>
-          <div class="login logged">
-            <picture>
-              <source srcset="images/avatars/image-juliusomo.png" type="image/png" class="backup-avatar" />
-              <img src="images/avatars/image-juliusomo.webp" alt="" class="user__avatar" />
-            </picture>
-            <div class="login-user">
-              <h3 class="login-user__name">Juliusomo</h3>
-              <p class="login-user__status">Logged</p>
-            </div>
-            <button class="login-button btn--hover">Login</button>
-          </div>
-          <div class="login">
-            <picture>
-              <source srcset="images/avatars/image-juliusomo.png" type="image/png" class="backup-avatar" />
-              <img src="images/avatars/image-juliusomo.webp" alt="" class="user__avatar" />
-            </picture>
-            <div class="login-user">
-              <h3 class="login-user__name">Juliusomo</h3>
-              <p class="login-user__status">Not Logged</p>
-            </div>
-            <button class="login-button btn--hover">Login</button>
-          </div>
-          <div class="login">
-            <picture>
-              <source srcset="images/avatars/image-juliusomo.png" type="image/png" class="backup-avatar" />
-              <img src="images/avatars/image-juliusomo.webp" alt="" class="user__avatar" />
-            </picture>
-            <div class="login-user">
-              <h3 class="login-user__name">Juliusomo</h3>
-              <p class="login-user__status">Not Logged</p>
-            </div>
-            <button class="login-button btn--hover">Login</button>
-          </div>
-          <div class="login">
-            <picture>
-              <source srcset="images/avatars/image-juliusomo.png" type="image/png" class="backup-avatar" />
-              <img src="images/avatars/image-juliusomo.webp" alt="" class="user__avatar" />
-            </picture>
-            <div class="login-user">
-              <h3 class="login-user__name">Juliusomo</h3>
-              <p class="login-user__status">Not Logged</p>
-            </div>
-            <button class="login-button btn--hover">Login</button>
-          </div>
+          <div id="login-cards"></div>
         </div>
       </div>
     </header>
+    <!-- Main -->
     <main id="main">
-      <!-- All Comments Container -->
-      <div id="comments-con"></div>
-      <!-- Form Container -->
-      <div class="hero-container">
-        <form id="form-post" class="form">
-          <div class="textarea-con">
-            <textarea class="form__txtarea" placeholder="Add a comment..."></textarea>
-          </div>
-          <div class="form-buttons">
-            <button type="submit" class="form__button btn--hover">Send</button>
-          </div>
-          <div class="form-avatar">
-            <picture>
-              <source srcset="./images/avatars/image-juliusomo.png" type="image/webp" />
-              <img src="./images/avatars/image-juliusomo.webp" alt="amyrobson" class="user__avatar" />
-            </picture>
-          </div>
-        </form>
+      <div id="comments-con">
+        <!-- All Comments Container -->
       </div>
-      <!-- Delete Comment Container -->
       <div class="del-comment-con">
+        <!-- Delete Comment Container -->
         <div class="del-comment">
           <h2>Delete comment</h2>
           <p>Are you sure you want to delete this comment? This will remove the comment and can't be undone.</p>
@@ -100,14 +50,27 @@
         </div>
       </div>
     </main>
-    <!-- Pull dynamic content from the data.json file -->
-
+    <!-- Footer -->
     <footer>
       <p class="attribution">
         Challenge by <a href="https://www.frontendmentor.io?ref=challenge" target="_blank">Frontend Mentor</a>. Coded with <i class="fa-solid fa-heart"></i> by
         <a href="https://github.com/LucasWeidas" target="_blank">Lucas Weidas</a>.
       </p>
     </footer>
+    <!-- Templates -->
+    <template id="login-card-template">
+      <div class="login">
+        <picture>
+          <source srcset="" type="image/png" class="backup-avatar" />
+          <img src="" alt="" class="user__avatar" />
+        </picture>
+        <div class="login-user">
+          <h3 class="login-user__name"></h3>
+          <p class="login-user__status">Not Logged</p>
+        </div>
+        <button class="login-button btn--hover">Login</button>
+      </div>
+    </template>
 
     <template id="post-con-template">
       <div class="post-con">
@@ -186,6 +149,26 @@
         </svg>
         Edit
       </button>
+    </template>
+
+    <template id="form-post-template">
+      <div class="hero-container" data-form-post>
+        <!-- Form Container -->
+        <form id="form-post" class="form">
+          <div class="textarea-con">
+            <textarea class="form__txtarea" placeholder="Add a comment..."></textarea>
+          </div>
+          <div class="form-buttons">
+            <button type="submit" class="form__button btn--hover" data-send>Send</button>
+          </div>
+          <div class="form-avatar">
+            <picture>
+              <source srcset="" type="image/webp" class="backup-avatar" />
+              <img src="" alt="" class="user__avatar" />
+            </picture>
+          </div>
+        </form>
+      </div>
     </template>
 
     <template id="form-reply-template">

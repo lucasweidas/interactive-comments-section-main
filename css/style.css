@@ -25,6 +25,7 @@
   --fs-default: clamp(0.875rem, 5vw, 1rem);
   --border-radius: 0.5rem;
   --transition: 150ms ease;
+  --slow-transition: 300ms ease;
   --block-gap: 1rem;
   --box-shadow: 0 0 10px -5px rgba(0, 0, 0, 0.1);
 }
@@ -95,16 +96,19 @@ svg {
   position: fixed;
   top: 0;
   left: 0;
-  background-color: hsla(238, 40%, 52%, 0.98);
+  background-color: hsl(0, 0%, 100%, 0.97);
   border-radius: 0 0 var(--border-radius) var(--border-radius);
-  padding-block: 1rem;
-  z-index: 20;
-  transition: border-radius var(--transition), height var(--transition);
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.3);
+  padding-block: 0.75rem;
+  z-index: 10;
+  overflow: hidden;
+  transition: border-radius var(--slow-transition), height var(--slow-transition);
 }
 
 #header.active {
   height: 100vh;
   border-radius: 0;
+  animation: header-down var(--slow-transition) forwards;
 }
 
 #header::after {
@@ -113,15 +117,31 @@ svg {
   width: 100%;
   height: 2px;
   position: absolute;
-  top: 48px;
+  top: 3rem;
   background-color: var(--light-grayish-blue);
   transform-origin: left;
   transform: scaleX(0);
-  transition: transform var(--transition);
+  transition: transform var(--slow-transition);
 }
 
 #header.active::after {
   transform: scaleX(1);
+}
+
+@keyframes header-down {
+  99% {
+    overflow: hidden;
+  }
+  100% {
+    overflow: auto;
+  }
+}
+
+@supports (backdrop-filter: blur()) {
+  #header {
+    background-color: hsl(0, 0%, 100%, 0.95);
+    backdrop-filter: blur(3px);
+  }
 }
 
 #menu-buttons {
@@ -130,14 +150,56 @@ svg {
   justify-content: flex-end;
   align-items: center;
   align-self: flex-start;
+  column-gap: 1.5rem;
   padding-inline: 1rem;
+}
+
+#switch-theme {
+  position: relative;
+}
+
+#switch-input {
+  appearance: none;
+  position: absolute;
+}
+
+#switch-label {
+  width: 3rem;
+  cursor: pointer;
+  background-color: var(--light-grayish-blue);
+  border-radius: 0.75rem;
+  padding: 0.25rem;
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+}
+
+#switch-label::after {
+  content: '';
+  display: block;
+  position: absolute;
+  top: 0.125rem;
+  right: 0.125rem;
+  width: 1.25rem;
+  height: 1.25rem;
+  background-color: var(--moderate-blue);
+  border-radius: 50%;
+  transition: transform var(--slow-transition);
+}
+
+.fa-solid {
+  color: var(--dark-blue);
+}
+
+#switch-input:checked + #switch-label::after {
+  transform: translateX(calc(-1.5rem));
 }
 
 #menu-btn {
   display: block;
   width: 20px;
   border-top: 2px solid;
-  color: var(--very-light-gray);
+  color: var(--moderate-blue);
 }
 
 #menu-btn::before,
@@ -149,12 +211,12 @@ svg {
   position: relative;
   background-color: currentColor;
   margin-top: 5px;
-  transition: transform var(--transition);
+  transition: transform var(--slow-transition);
 }
 
 #header.active #menu-btn {
   border-top-color: transparent;
-  color: var(--pale-red);
+  color: var(--soft-Red);
 }
 
 #header.active #menu-btn::before {
@@ -168,48 +230,53 @@ svg {
 
 #menu-drop-down {
   width: min(calc(100vw - 2rem), 45.75rem);
-  height: 0;
-  position: fixed;
+  height: calc(100% - 3rem);
+  position: absolute;
   top: 3rem;
-  transition: height var(--transition);
-  overflow: hidden;
-}
-
-#header.active #menu-drop-down {
-  animation-name: drop-animation;
+  animation-name: hide-menu;
+  animation-duration: 300ms;
   animation-timing-function: ease;
-  animation-duration: 150ms;
   animation-fill-mode: forwards;
 }
 
-@keyframes drop-animation {
-  from {
-    height: 0;
-    overflow: hidden;
-  }
-  99% {
-    overflow: hidden;
-  }
+#header.active #menu-drop-down {
+  animation-name: show-menu;
+}
+
+@keyframes hide-menu {
   to {
-    height: 100%;
-    overflow: auto;
+    visibility: hidden;
   }
 }
 
-#drop-down-content {
+@keyframes show-menu {
+  to {
+    visibility: visible;
+  }
+}
+
+#drop-down-content,
+#login-cards {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: var(--block-gap);
-  padding-block: 1rem 5rem;
+}
+
+#drop-down-content {
+  padding-block: 1rem 2rem;
 }
 
 #drop-down-content > h2 {
   text-align: center;
   font-size: 1.5rem;
   font-weight: 500;
-  color: var(--very-light-gray);
+  color: var(--dark-blue);
   margin-block-end: 1rem;
+}
+
+#login-cards {
+  width: 100%;
 }
 
 .login {
@@ -221,16 +288,17 @@ svg {
   gap: var(--block-gap);
   background-color: var(--very-light-gray);
   border-radius: var(--border-radius);
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.2);
   padding: 1rem;
 }
 
 .login .user__avatar {
   width: 3rem;
-  border: 2px solid var(--pale-red);
+  border: 2px solid var(--grayish-blue);
   border-radius: 50%;
 }
 
-.login.logged .user__avatar {
+.login[data-logged] .user__avatar {
   border-color: var(--moderate-blue);
 }
 
@@ -252,6 +320,10 @@ svg {
   color: var(--grayish-blue);
 }
 
+.login[data-logged] .login-user__status {
+  color: var(--moderate-blue);
+}
+
 .login-button {
   flex: 1 1 auto;
   text-transform: uppercase;
@@ -261,16 +333,9 @@ svg {
   padding: 1em 1.5em;
 }
 
-.login.logged .login-button {
+.login[data-logged] .login-button {
   cursor: not-allowed;
   background-color: var(--grayish-blue);
-}
-
-@supports (backdrop-filter: blur()) {
-  #header {
-    background-color: hsla(238, 40%, 52%, 0.95);
-    backdrop-filter: blur(3px);
-  }
 }
 
 /*******************************************/
@@ -534,6 +599,7 @@ svg {
   top: 0;
   left: 0;
   background-color: hsl(0, 0%, 0%, 0.4);
+  z-index: 20;
 }
 
 .del-comment-con.active {

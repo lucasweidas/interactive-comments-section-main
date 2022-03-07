@@ -24,10 +24,11 @@ function getCommentId(element) {
 }
 
 // Will create a NEW comment and add it to the root of the comments container
-export async function createNewPostComment(evt) {
+export function createNewPostComment(evt) {
   const allCommentCon = document.querySelector('#comments-con');
-  const textArea = evt.currentTarget.querySelector('.form__txtarea');
-  const userData = await data.getCurrentUserData();
+  const formCon = evt.currentTarget.querySelector('#form-post');
+  const textArea = formCon.querySelector('.form__txtarea');
+  const userData = data.getCurrentUser();
   const postContainer = form.newComment(userData, textArea.value);
 
   allCommentCon.appendChild(postContainer);
@@ -35,13 +36,13 @@ export async function createNewPostComment(evt) {
 }
 
 // It will create and add a new reply comment to the comment and remove the "reply form"
-export async function createNewReplyComment(evt) {
+export function createNewReplyComment(evt) {
   const postContainer = getPostContainer(evt);
   const repliesCon = getRepliesSection(postContainer);
   const commentId = getCommentId(repliesCon);
   const formCon = getDirectChild(postContainer, '.form-container');
   const textArea = formCon.querySelector('.form__txtarea');
-  const userData = await data.getCurrentUserData();
+  const userData = data.getCurrentUser();
   const newPostContainer = form.newComment(userData, textArea.value, commentId);
 
   postContainer.removeChild(formCon);
@@ -104,11 +105,11 @@ export function createNewEditForm(evt) {
 }
 
 // Will add a "reply form" if the comment does not already have one
-export async function createNewReplyForm(evt) {
+export function createNewReplyForm(evt) {
   const postContainer = getPostContainer(evt);
   const repliesCon = postContainer.querySelector('.replies');
   const replyingTo = postContainer.querySelector('.user-text__name').innerText;
-  const userData = await data.getCurrentUserData();
+  const userData = data.getCurrentUser();
 
   // If the Replies Section does not have an Reply Form
   if (getDirectChild(postContainer, '.form-container') === undefined) {
@@ -136,26 +137,28 @@ export function registerUpVote(evt) {
   // and the second is to actually add the UP vote
   if (isAlreadyVoted(currentUser, correctComment.usersDownVoted)) {
     const position = correctComment.usersDownVoted.indexOf(currentUser.username);
-    correctComment.usersDownVoted.splice(position, 1);
+    // If the user's name is in the list
+    if (position > -1) correctComment.usersDownVoted.splice(position, 1);
     correctComment.usersUpVoted.push(currentUser.username);
     correctComment.score = actualScore + 2;
     localStorage.setItem('comments', JSON.stringify(comments));
     rateScore.innerText = form.formatCommentScore(correctComment.score);
     downVoteBtn.classList.remove('voted');
-    upVoteBtn.classList.add('voted');
-    return;
+    return upVoteBtn.classList.add('voted');
   }
 
   // If the current user has already up voted, it will remove this vote
   if (isAlreadyVoted(currentUser, correctComment.usersUpVoted)) {
     const position = correctComment.usersUpVoted.indexOf(currentUser.username);
-    correctComment.usersUpVoted.splice(position, 1);
+    // If the user's name is in the list
+    if (position > -1) correctComment.usersUpVoted.splice(position, 1);
     correctComment.score = actualScore - 1;
     upVoteBtn.classList.remove('voted');
   } else {
     // Else, it will add one UP vote
     const position = correctComment.usersDownVoted.indexOf(currentUser.username);
-    correctComment.usersDownVoted.splice(position, 1);
+    // If the user's name is in the list
+    if (position > -1) correctComment.usersDownVoted.splice(position, 1);
     correctComment.usersUpVoted.push(currentUser.username);
     correctComment.score = actualScore + 1;
     upVoteBtn.classList.add('voted');
@@ -184,26 +187,28 @@ export function registerDownVote(evt) {
   // and the second is to actually add the DOWN vote
   if (isAlreadyVoted(currentUser, correctComment.usersUpVoted)) {
     const position = correctComment.usersUpVoted.indexOf(currentUser.username);
-    correctComment.usersUpVoted.splice(position, 1);
+    // If the user's name is in the list
+    if (position > -1) correctComment.usersUpVoted.splice(position, 1);
     correctComment.usersDownVoted.push(currentUser.username);
     correctComment.score = actualScore - 2;
     localStorage.setItem('comments', JSON.stringify(comments));
     rateScore.innerText = form.formatCommentScore(correctComment.score);
     upVoteBtn.classList.remove('voted');
-    downVoteBtn.classList.add('voted');
-    return;
+    return downVoteBtn.classList.add('voted');
   }
 
   // If the current user has already DOWN voted, it will remove this vote
   if (isAlreadyVoted(currentUser, correctComment.usersDownVoted)) {
     const position = correctComment.usersDownVoted.indexOf(currentUser.username);
-    correctComment.usersDownVoted.splice(position, 1);
+    // If the user's name is in the list
+    if (position > -1) correctComment.usersDownVoted.splice(position, 1);
     correctComment.score = actualScore + 1;
     downVoteBtn.classList.remove('voted');
   } else {
     // Else, it will add one DOWN vote
     const position = correctComment.usersUpVoted.indexOf(currentUser.username);
-    correctComment.usersUpVoted.splice(position, 1);
+    // If the user's name is in the list
+    if (position > -1) correctComment.usersUpVoted.splice(position, 1);
     correctComment.usersDownVoted.push(currentUser.username);
     correctComment.score = actualScore - 1;
     downVoteBtn.classList.add('voted');
@@ -244,14 +249,7 @@ export function deleteComment(postContainer) {
 }
 
 // Every time the page is loaded, it will load all the needed things
-export async function loadComments() {
-  // If "localStorage" doesn't have any data about "currentUser" and "commnets", then create it
-  if (!localStorage.getItem('currentUser') && !localStorage.getItem('comments')) {
-    const userData = await data.getCurrentUserData();
-    const commentsData = await data.getCommentsData();
-    createLocalStorage(userData, commentsData);
-  }
-
+export function loadComments() {
   const allCommentCon = document.querySelector('#comments-con');
   const userData = JSON.parse(localStorage.getItem('currentUser'));
   const commentsData = JSON.parse(localStorage.getItem('comments'));
@@ -270,11 +268,83 @@ export async function loadComments() {
   });
 }
 
+export function loadLoginCards() {
+  const currentUser = data.getCurrentUser();
+  const allUsers = data.getUsers();
+
+  allUsers.forEach(user => form.createLoginCard(currentUser, user));
+}
+
+export function loadFormPost() {
+  const currentUser = data.getCurrentUser();
+  form.createFormPost(currentUser);
+}
+
+export function changeCurrentUser(evt) {
+  const allUsers = data.getUsers();
+  const mainCon = document.querySelector('#main');
+  const formPost = document.querySelector('[data-form-post]');
+  const loginCardsCon = document.querySelector('#login-cards');
+  const commentsCon = document.querySelector('#comments-con');
+  const loginCon = evt.target.parentElement;
+  const loginUser = loginCon.querySelector('.login-user__name').innerText;
+
+  removeAllChildren(loginCardsCon);
+  removeAllChildren(commentsCon);
+  mainCon.removeChild(formPost);
+
+  allUsers.forEach(user => {
+    if (user.username === loginUser) {
+      localStorage.setItem('currentUser', JSON.stringify(user));
+      loadLoginCards();
+      loadComments();
+      loadFormPost();
+    }
+  });
+}
+
 // Will create a new space and store the datas on the "localStorage"
-function createLocalStorage(userData, commentsData) {
+export async function createLocalStorage() {
+  const userData = await data.getCurrentUserData();
+  const commentsData = await data.getCommentsData();
+
   localStorage.setItem('currentUser', JSON.stringify(userData));
+  localStorage.setItem('users', createUsersJSON());
   localStorage.setItem('availableId', 5);
   localStorage.setItem('comments', JSON.stringify(commentsData));
+}
+
+function createUsersJSON() {
+  return JSON.stringify([
+    {
+      image: {
+        png: './images/avatars/image-juliusomo.png',
+        webp: './images/avatars/image-juliusomo.webp',
+      },
+      username: 'juliusomo',
+    },
+    {
+      image: {
+        png: './images/avatars/image-amyrobson.png',
+        webp: './images/avatars/image-amyrobson.webp',
+      },
+      username: 'amyrobson',
+    },
+    {
+      image: {
+        png: './images/avatars/image-maxblagun.png',
+        webp: './images/avatars/image-maxblagun.webp',
+      },
+      username: 'maxblagun',
+    },
+    {
+      image: {
+        png: './images/avatars/image-ramsesmiron.png',
+        webp: './images/avatars/image-ramsesmiron.webp',
+      },
+      username: 'ramsesmiron',
+    },
+  ]);
 }
 
 // It will get the correct comment from the localStorage, based on the "commentId"
@@ -292,4 +362,10 @@ function getCorrectComment(comments, commentId) {
     });
   });
   return correctComment;
+}
+
+function removeAllChildren(element) {
+  while (element.firstElementChild) {
+    element.removeChild(element.firstElementChild);
+  }
 }

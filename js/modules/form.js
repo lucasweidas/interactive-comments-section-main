@@ -166,6 +166,30 @@ export function addEditForm(commentText) {
   return formUpdateClone;
 }
 
+export function createLoginCard(currentUser, user) {
+  const loginCardsCon = document.querySelector('#login-cards');
+  const loginCardTemplate = document.querySelector('#login-card-template');
+  const loginCardClone = loginCardTemplate.content.cloneNode(true);
+  const loginCon = loginCardClone.querySelector('.login');
+  const backupAvatarImg = loginCardClone.querySelector('.backup-avatar');
+  const userAvatarImg = loginCardClone.querySelector('.user__avatar');
+  const userNameH3 = loginCardClone.querySelector('.login-user__name');
+  const statusP = loginCardClone.querySelector('.login-user__status');
+
+  backupAvatarImg.srcset = user.image.png;
+  userAvatarImg.src = user.image.webp;
+  userAvatarImg.alt = user.username;
+  userNameH3.innerText = user.username;
+
+  if (isDeepEqual(currentUser, user)) {
+    loginCon.setAttribute('data-logged', '');
+    statusP.innerText = 'Logged';
+    return loginCardsCon.prepend(loginCardClone);
+  }
+
+  loginCardsCon.appendChild(loginCardClone);
+}
+
 export function loadCreatedComments(userData, commentData, isReply) {
   const postTemplate = document.querySelector('#post-con-template');
   const postClone = postTemplate.content.cloneNode(true);
@@ -224,6 +248,19 @@ export function loadCreatedComments(userData, commentData, isReply) {
   }
   // Returns the Comment Post Container
   return postClone;
+}
+
+export function createFormPost(currentUser) {
+  const mainCon = document.querySelector('#main');
+  const formTemplate = document.querySelector('#form-post-template');
+  const formClone = formTemplate.content.cloneNode(true);
+  const backupAvatarImg = formClone.querySelector('.backup-avatar');
+  const userAvatarImg = formClone.querySelector('.user__avatar');
+
+  backupAvatarImg.srcset = currentUser.image.png;
+  userAvatarImg.src = currentUser.image.webp;
+  userAvatarImg.alt = currentUser.username;
+  mainCon.insertBefore(formClone, mainCon.lastElementChild);
 }
 
 export function addReplyingToMark(element, replyingTo) {
