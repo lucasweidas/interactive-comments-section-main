@@ -14,6 +14,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (!hasUser && !hasUsers && !hasId && !hasComments) {
     await event.createLocalStorage();
   }
+
+  event.changeTheme(localStorage.darkMode);
   event.loadLoginCards();
   event.loadComments();
   event.loadFormPost();
@@ -92,6 +94,10 @@ deleteCommentCon.addEventListener('click', evt => {
 });
 
 headerCon.addEventListener('click', evt => {
+  if (evt.target.matches('#switch-input')) {
+    event.changeTheme(evt.target.checked.toString());
+  }
+
   // If it is the Menu Button
   if (evt.target.matches('#menu-btn')) {
     return headerCon.classList.toggle('active');

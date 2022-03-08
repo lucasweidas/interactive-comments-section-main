@@ -303,6 +303,21 @@ export function changeCurrentUser(evt) {
   });
 }
 
+export function changeTheme(isDarkMode) {
+  const checkbox = document.querySelector('#switch-input');
+  const label = document.querySelector('#switch-label');
+  localStorage.setItem('darkMode', isDarkMode);
+
+  if (isDarkMode === 'true') {
+    checkbox.checked = true;
+    label.ariaLabel = 'Switch theme to light mode';
+    return document.documentElement.setAttribute('data-dark-mode', '');
+  }
+  
+  label.ariaLabel = 'Switch theme to dark mode';
+  document.documentElement.removeAttribute('data-dark-mode');
+}
+
 // Will create a new space and store the datas on the "localStorage"
 export async function createLocalStorage() {
   const userData = await data.getCurrentUserData();
@@ -312,6 +327,7 @@ export async function createLocalStorage() {
   localStorage.setItem('users', createUsersJSON());
   localStorage.setItem('availableId', 5);
   localStorage.setItem('comments', JSON.stringify(commentsData));
+  localStorage.setItem('darkMode', false);
 }
 
 function createUsersJSON() {

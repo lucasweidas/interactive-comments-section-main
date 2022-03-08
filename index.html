@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Frontend Mentor | Interactive comments section</title>
     <link rel="icon" type="image/png" sizes="32x32" href="./images/favicon-32x32.png" />
+    <script>
+      if (localStorage.darkMode === 'true') document.documentElement.setAttribute('data-dark-mode', '');
+    </script>
     <link rel="stylesheet" href="css/style.css" />
     <script type="module" src="js/main.js"></script>
     <link
@@ -21,12 +24,12 @@
       <div id="menu-buttons">
         <div id="switch-theme">
           <input type="checkbox" id="switch-input" />
-          <label for="switch-input" id="switch-label">
-            <i class="fa-solid fa-sun"></i>
+          <label for="switch-input" id="switch-label" aria-label="Switch theme to dark mode">
             <i class="fa-solid fa-moon"></i>
+            <i class="fa-solid fa-sun"></i>
           </label>
         </div>
-        <button id="menu-btn"></button>
+        <button id="menu-btn" title="User Menu"></button>
       </div>
       <div id="menu-drop-down">
         <div id="drop-down-content">
@@ -38,6 +41,7 @@
     <!-- Main -->
     <main id="main">
       <div id="comments-con">
+        <h1 class="sr-only">Users Comments</h1>
         <!-- All Comments Container -->
       </div>
       <div class="del-comment-con">

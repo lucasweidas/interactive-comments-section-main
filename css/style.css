@@ -11,23 +11,52 @@
 /*******************************************/
 /* Variables */
 :root {
-  --moderate-blue: hsl(238, 40%, 52%);
-  --soft-Red: hsl(358, 79%, 66%);
-  --light-grayish-blue: hsl(239, 57%, 85%);
-  --pale-red: hsl(357, 100%, 86%);
-  --dark-blue: hsl(212, 24%, 26%);
-  --grayish-blue: hsl(211, 10%, 45%);
-  --light-gray: hsl(223, 19%, 93%);
-  --very-light-gray: hsl(228, 33%, 97%);
-  --white: hsl(0, 0%, 100%);
+  --clr-primary-01: hsl(238, 40%, 52%);
+  --clr-primary-02: hsl(358, 79%, 66%);
+  --clr-primary-03: hsl(239, 57%, 85%);
+  --clr-primary-04: hsl(357, 100%, 86%);
+  --clr-primary-05: var(--clr-neutral-02);
+
+  --clr-neutral-01: hsl(212, 24%, 26%);
+  --clr-neutral-02: hsl(211, 10%, 45%);
+  --clr-neutral-03: hsl(223, 19%, 93%);
+  --clr-neutral-04: hsl(228, 33%, 97%);
+  --clr-neutral-05: hsl(0, 0%, 100%);
+  --clr-neutral-06: hsl(0, 0%, 100%, 0.97);
+  --clr-neutral-07: hsl(211, 10%, 45%, 0.1);
+  --clr-neutral-08: var(--clr-neutral-05);
+
+  --clr-textarea: hsl(0, 0%, 0%);
+  --clr-placeholder: var(--clr-neutral-02);
 
   --ff-rubik: 'Rubik', sans-serif;
   --fs-default: clamp(0.875rem, 5vw, 1rem);
   --border-radius: 0.5rem;
   --transition: 150ms ease;
   --slow-transition: 300ms ease;
+  --theme-transition: 400ms ease;
   --block-gap: 1rem;
   --box-shadow: 0 0 10px -5px rgba(0, 0, 0, 0.1);
+  --header-height: 3.125rem;
+}
+
+/* Dark Mode Colors */
+[data-dark-mode]:root {
+  --clr-primary-01: hsl(238, 100%, 80%);
+  --clr-primary-03: hsl(0, 0%, 45%);
+  --clr-primary-05: hsl(240, 7%, 70%);
+
+  --clr-neutral-01: hsl(214, 8%, 83%);
+  --clr-neutral-02: hsl(210, 9%, 91%);
+  --clr-neutral-03: hsl(0, 0%, 30%);
+  --clr-neutral-04: hsl(0, 0%, 12%);
+  --clr-neutral-05: hsl(0, 0%, 16%);
+  --clr-neutral-06: hsl(0, 0%, 16%, 0.98);
+  --clr-neutral-07: hsl(210, 9%, 91%, 0.1);
+  --clr-neutral-08: var(--clr-neutral-04);
+
+  --clr-textarea: hsl(0, 0%, 96%);
+  --clr-placeholder: hsl(214, 8%, 70%);
 }
 
 /*******************************************/
@@ -40,8 +69,8 @@ body {
   align-items: center;
   font-family: var(--ff-rubik);
   font-size: var(--fs-default);
-  background-color: var(--grayish-blue);
-  background-color: var(--very-light-gray);
+  background-color: var(--clr-neutral-04);
+  transition: background-color var(--theme-transition);
 }
 
 button {
@@ -54,6 +83,7 @@ button {
   font-family: var(--ff-rubik);
   font-size: var(--fs-default);
   font-weight: 500;
+  transition: background-color var(--theme-transition);
 }
 
 a {
@@ -62,10 +92,11 @@ a {
 
 .hero-container {
   width: 100%;
-  background-color: var(--white);
+  background-color: var(--clr-neutral-05);
   border-radius: var(--border-radius);
-  padding: clamp(1rem, 3vw, 1.5rem);
   box-shadow: var(--box-shadow);
+  padding: clamp(1rem, 3vw, 1.5rem);
+  transition: background-color var(--theme-transition);
 }
 
 .btn--hover {
@@ -89,20 +120,24 @@ svg {
 /* Header Container */
 #header {
   width: 100%;
-  height: 3rem;
+  height: var(--header-height);
   display: flex;
   justify-content: center;
   align-items: center;
   position: fixed;
   top: 0;
   left: 0;
-  background-color: hsl(0, 0%, 100%, 0.97);
+  background-color: var(--clr-neutral-06);
   border-radius: 0 0 var(--border-radius) var(--border-radius);
   box-shadow: 0 1px 5px rgba(0, 0, 0, 0.3);
   padding-block: 0.75rem;
   z-index: 10;
   overflow: hidden;
-  transition: border-radius var(--slow-transition), height var(--slow-transition);
+  transition: border-radius var(--slow-transition), height var(--slow-transition), background-color var(--theme-transition), box-shadow var(--theme-transition);
+}
+
+[data-dark-mode] #header {
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.8);
 }
 
 #header.active {
@@ -117,8 +152,8 @@ svg {
   width: 100%;
   height: 2px;
   position: absolute;
-  top: 3rem;
-  background-color: var(--light-grayish-blue);
+  top: var(--header-height);
+  background-color: var(--clr-primary-01);
   transform-origin: left;
   transform: scaleX(0);
   transition: transform var(--slow-transition);
@@ -138,9 +173,10 @@ svg {
 }
 
 @supports (backdrop-filter: blur()) {
-  #header {
-    background-color: hsl(0, 0%, 100%, 0.95);
-    backdrop-filter: blur(3px);
+  html:not([data-dark-mode]) #header {
+    --clr-neutral-06: hsl(0, 0%, 100%, 0.95);
+    background-color: var(--clr-neutral-06);
+    backdrop-filter: blur(2px);
   }
 }
 
@@ -165,13 +201,16 @@ svg {
 
 #switch-label {
   width: 3rem;
-  cursor: pointer;
-  background-color: var(--light-grayish-blue);
-  border-radius: 0.75rem;
-  padding: 0.25rem;
   display: flex;
   justify-content: space-between;
   position: relative;
+  cursor: pointer;
+  color: var(--clr-neutral-01);
+  background-color: var(--clr-neutral-05);
+  border: 1px solid var(--clr-primary-01);
+  border-radius: 0.75rem;
+  padding: 0.25rem;
+  transition: background-color var(--theme-transition), color var(--theme-transition);
 }
 
 #switch-label::after {
@@ -179,27 +218,23 @@ svg {
   display: block;
   position: absolute;
   top: 0.125rem;
-  right: 0.125rem;
+  left: 0.125rem;
   width: 1.25rem;
   height: 1.25rem;
-  background-color: var(--moderate-blue);
+  background-color: var(--clr-primary-01);
   border-radius: 50%;
-  transition: transform var(--slow-transition);
-}
-
-.fa-solid {
-  color: var(--dark-blue);
+  transition: transform var(--theme-transition);
 }
 
 #switch-input:checked + #switch-label::after {
-  transform: translateX(calc(-1.5rem));
+  transform: translateX(1.375rem);
 }
 
 #menu-btn {
   display: block;
   width: 20px;
   border-top: 2px solid;
-  color: var(--moderate-blue);
+  color: var(--clr-primary-01);
 }
 
 #menu-btn::before,
@@ -216,7 +251,7 @@ svg {
 
 #header.active #menu-btn {
   border-top-color: transparent;
-  color: var(--soft-Red);
+  color: var(--clr-primary-02);
 }
 
 #header.active #menu-btn::before {
@@ -230,13 +265,10 @@ svg {
 
 #menu-drop-down {
   width: min(calc(100vw - 2rem), 45.75rem);
-  height: calc(100% - 3rem);
+  height: calc(100% - var(--header-height));
   position: absolute;
-  top: 3rem;
-  animation-name: hide-menu;
-  animation-duration: 300ms;
-  animation-timing-function: ease;
-  animation-fill-mode: forwards;
+  top: var(--header-height);
+  animation: hide-menu 300ms ease forwards;
 }
 
 #header.active #menu-drop-down {
@@ -271,8 +303,9 @@ svg {
   text-align: center;
   font-size: 1.5rem;
   font-weight: 500;
-  color: var(--dark-blue);
+  color: var(--clr-neutral-01);
   margin-block-end: 1rem;
+  transition: color var(--theme-transition);
 }
 
 #login-cards {
@@ -286,56 +319,62 @@ svg {
   justify-content: center;
   align-items: center;
   gap: var(--block-gap);
-  background-color: var(--very-light-gray);
+  background-color: var(--clr-neutral-04);
   border-radius: var(--border-radius);
   box-shadow: 0 0 2px rgba(0, 0, 0, 0.2);
   padding: 1rem;
+  transition: background-color var(--theme-transition);
 }
 
 .login .user__avatar {
   width: 3rem;
-  border: 2px solid var(--grayish-blue);
+  border: 2px solid var(--clr-primary-05);
   border-radius: 50%;
+  transition: border-color var(--theme-transition);
 }
 
 .login[data-logged] .user__avatar {
-  border-color: var(--moderate-blue);
+  border-color: var(--clr-primary-01);
 }
 
 .login-user {
-  flex: 1 1 auto;
+  width: 120px;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  margin-inline: auto;
+  row-gap: 0.25em;
 }
 
 .login-user__name {
   font-size: 1.125rem;
-  color: var(--dark-blue);
+  color: var(--clr-neutral-01);
+  transition: color var(--theme-transition);
 }
 
 .login-user__status {
   font-size: 0.875rem;
-  color: var(--grayish-blue);
+  color: var(--clr-primary-05);
+  transition: color var(--theme-transition);
 }
 
 .login[data-logged] .login-user__status {
-  color: var(--moderate-blue);
+  color: var(--clr-primary-01);
+  font-weight: 500;
 }
 
 .login-button {
   flex: 1 1 auto;
   text-transform: uppercase;
-  color: var(--white);
+  color: var(--clr-neutral-08);
   border-radius: var(--border-radius);
-  background-color: var(--moderate-blue);
+  background-color: var(--clr-primary-01);
   padding: 1em 1.5em;
+  transition: color var(--theme-transition), background-color var(--theme-transition);
 }
 
 .login[data-logged] .login-button {
   cursor: not-allowed;
-  background-color: var(--grayish-blue);
+  background-color: var(--clr-primary-05);
 }
 
 /*******************************************/
@@ -395,19 +434,22 @@ svg {
   column-gap: 0.25rem;
   font-size: var(--fs-default);
   font-weight: 500;
-  color: var(--dark-blue);
+  color: var(--clr-neutral-01);
+  transition: color var(--theme-transition);
 }
 
 .user__mark {
   font-weight: 400;
-  color: var(--white);
-  background-color: var(--moderate-blue);
+  color: var(--clr-neutral-08);
+  background-color: var(--clr-primary-01);
   border-radius: 0.18rem;
   padding: 0 0.375em 0.125em;
+  transition: color var(--theme-transition), background-color var(--theme-transition);
 }
 
 .user-text__commented {
-  color: var(--grayish-blue);
+  color: var(--clr-neutral-02);
+  transition: color var(--theme-transition);
 }
 
 .user__avatar {
@@ -423,13 +465,15 @@ svg {
 }
 
 .comment-content > p {
-  color: var(--grayish-blue);
+  color: var(--clr-neutral-02);
   line-height: 1.5em;
+  transition: color var(--theme-transition);
 }
 
 .comment-content .replying-to {
-  color: var(--moderate-blue);
+  color: var(--clr-primary-01);
   font-weight: 500;
+  transition: color var(--theme-transition);
 }
 
 /* Post - Rating Container */
@@ -438,10 +482,11 @@ svg {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  background-color: var(--very-light-gray);
+  background-color: var(--clr-neutral-04);
   border-radius: var(--border-radius);
   padding: 0.375rem;
   grid-area: rate;
+  transition: background-color var(--theme-transition);
 }
 
 .rate__button {
@@ -451,21 +496,23 @@ svg {
 }
 
 .rate__button > svg path {
+  fill: var(--clr-primary-03);
   transition: fill var(--transition);
 }
 
 .rate__button.voted > svg path {
-  fill: var(--moderate-blue);
+  fill: var(--clr-primary-01);
 }
 
 .rate__button:hover > svg path,
 .rate__button:focus-visible > svg path {
-  fill: var(--moderate-blue);
+  fill: var(--clr-primary-01);
 }
 
 .rate__score {
   font-weight: 500;
-  color: var(--moderate-blue);
+  color: var(--clr-primary-01);
+  transition: color var(--theme-transition);
 }
 
 /* Post - Options Buttons Container */
@@ -479,18 +526,23 @@ svg {
 .options__button {
   column-gap: 0.5rem;
   padding-block: 0.25rem;
+  transition: color var(--theme-transition);
+}
+
+.options__button svg path {
+  fill: currentColor;
 }
 
 .options__reply-btn {
-  color: var(--moderate-blue);
+  color: var(--clr-primary-01);
 }
 
 .options__del-btn {
-  color: var(--soft-Red);
+  color: var(--clr-primary-02);
 }
 
 .options__edit-btn {
-  color: var(--moderate-blue);
+  color: var(--clr-primary-01);
 }
 
 /*******************************************/
@@ -511,7 +563,8 @@ svg {
   position: absolute;
   top: 0;
   left: 0;
-  background-color: hsl(211, 10%, 45%, 0.1);
+  background-color: var(--clr-neutral-07);
+  transition: background-color var(--theme-transition);
 }
 
 /*******************************************/
@@ -528,20 +581,22 @@ svg {
   width: 100%;
   height: 100%;
   display: flex;
-  border: 1px solid var(--light-gray);
+  border: 1px solid var(--clr-neutral-03);
   border-radius: var(--border-radius);
   overflow: hidden;
   grid-area: textarea;
+  transition: border-color var(--theme-transition);
 }
 
 .textarea-con:focus-within {
-  border: 1px solid var(--moderate-blue);
+  border-color: var(--clr-primary-01);
 }
 
 .form__txtarea {
   width: 100%;
   height: 100%;
   min-height: 6rem;
+  color: var(--clr-textarea);
   font-family: var(--ff-rubik);
   font-size: var(--fs-default);
   border: none;
@@ -549,7 +604,13 @@ svg {
   background-color: transparent;
   padding: 1em 1.5em;
   resize: none;
-  caret-color: var(--moderate-blue);
+  caret-color: var(--clr-primary-01);
+  transition: color var(--theme-transition);
+}
+
+.form__txtarea::placeholder {
+  color: var(--clr-placeholder);
+  transition: color var(--theme-transition);
 }
 
 .form__txtarea:focus-visible {
@@ -568,10 +629,11 @@ svg {
   width: 6.5rem;
   font-size: var(--fs-default);
   text-transform: uppercase;
-  color: var(--white);
-  background-color: var(--moderate-blue);
+  color: var(--clr-neutral-08);
+  background-color: var(--clr-primary-01);
   border-radius: var(--border-radius);
   padding: 0.875em;
+  transition: color var(--theme-transition), background-color var(--theme-transition);
 }
 
 .form-avatar {
@@ -612,7 +674,7 @@ svg {
   flex-wrap: wrap;
   justify-content: space-between;
   row-gap: 1rem;
-  background-color: var(--white);
+  background-color: var(--clr-neutral-05);
   border-radius: var(--border-radius);
   padding: clamp(1.5rem, 4vw, 2rem);
 }
@@ -620,17 +682,17 @@ svg {
 .del-comment > h2 {
   font-size: clamp(1.25rem, 4vw, 1.5rem);
   font-weight: 500;
-  color: var(--dark-blue);
+  color: var(--clr-neutral-01);
 }
 
 .del-comment > p {
   line-height: 1.5em;
-  color: var(--grayish-blue);
+  color: var(--clr-neutral-02);
 }
 
 .del-comment__btn {
   width: clamp(8.75rem, 48%, 10.5rem);
-  color: var(--white);
+  color: var(--clr-neutral-05);
   text-transform: uppercase;
   border-radius: var(--border-radius);
   padding-block: 1em;
@@ -638,11 +700,11 @@ svg {
 
 #cancel-del-comment,
 .form__cancel-btn {
-  background-color: var(--grayish-blue);
+  background-color: var(--clr-primary-05);
 }
 
 #confirm-del-comment {
-  background-color: var(--soft-Red);
+  background-color: var(--clr-primary-02);
 }
 
 /*******************************************/
@@ -654,11 +716,12 @@ footer {
 
 .attribution {
   line-height: 1.6em;
-  color: var(--dark-blue);
+  color: var(--clr-neutral-01);
+  transition: color var(--theme-transition);
 }
 
 .attribution > .fa-heart {
-  color: var(--soft-Red);
+  color: var(--clr-primary-02);
 }
 
 .attribution > a {
@@ -667,7 +730,7 @@ footer {
 }
 
 .attribution > a:hover {
-  color: var(--moderate-blue);
+  color: var(--clr-primary-01);
 }
 
 /*******************************************/
@@ -675,6 +738,11 @@ footer {
 @media (max-width: 370px) {
   .del-comment__btn {
     width: 100%;
+  }
+
+  .login-button {
+    font-size: 0.875rem;
+    padding-block: 0.875em;
   }
 }
 
