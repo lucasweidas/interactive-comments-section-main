@@ -28,7 +28,7 @@ function getCommentId(element) {
 // Will create a NEW comment and add it to the root of the comments container
 export function createNewPostComment(evt) {
   const allCommentCon = document.querySelector('#comments-con');
-  const formCon = evt.currentTarget.querySelector('#form-post');
+  const formCon = evt.currentTarget.querySelector('.form-post');
   const textArea = formCon.querySelector('.form__txtarea');
   const userData = data.getCurrentUser();
   const postContainer = form.newComment(userData, textArea.value);
