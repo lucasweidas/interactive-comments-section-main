@@ -319,7 +319,7 @@ svg {
   width: min(100%, 400px);
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
   gap: var(--block-gap);
   background-color: var(--clr-neutral-04);
@@ -330,7 +330,7 @@ svg {
 }
 
 .login .user__avatar {
-  width: 3rem;
+  width: 2.5rem;
   border: 2px solid var(--clr-primary-05);
   border-radius: 50%;
   transition: border-color var(--theme-transition);
@@ -345,11 +345,11 @@ svg {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  row-gap: 0.25em;
+  gap: 0.25rem var(--block-gap);
 }
 
 .login-user__name {
-  font-size: 1.125rem;
+  font-size: 1rem;
   color: var(--clr-neutral-01);
   transition: color var(--theme-transition);
 }
@@ -366,12 +366,13 @@ svg {
 }
 
 .login-button {
-  flex: 1 1 auto;
+  flex: 1 1 100%;
   text-transform: uppercase;
+  font-size: 0.875rem;
   color: var(--clr-neutral-08);
   border-radius: var(--border-radius);
   background-color: var(--clr-primary-01);
-  padding: 1em 1.5em;
+  padding: 0.875em 1.5em;
   transition: color var(--theme-transition), background-color var(--theme-transition);
 }
 
@@ -676,7 +677,7 @@ svg {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-  row-gap: 1rem;
+  gap: 1rem 0.875rem;
   background-color: var(--clr-neutral-05);
   border-radius: var(--border-radius);
   padding: clamp(1.5rem, 4vw, 2rem);
@@ -694,11 +695,11 @@ svg {
 }
 
 .del-comment__btn {
-  width: clamp(8.75rem, 48%, 10.5rem);
+  flex: 1 1 auto;
   color: var(--clr-neutral-05);
   text-transform: uppercase;
   border-radius: var(--border-radius);
-  padding-block: 1em;
+  padding: 1em 1.25em;
 }
 
 #cancel-del-comment,
@@ -738,14 +739,28 @@ footer {
 
 /*******************************************/
 /* Media Queries */
-@media (max-width: 370px) {
-  .del-comment__btn {
-    width: 100%;
+@media (min-width: 370px) {
+  .login-button {
+    flex-basis: auto;
+  }
+}
+
+@media (min-width: 400px) {
+  .login {
+    justify-content: center;
+  }
+
+  .login .user__avatar {
+    width: 3rem;
+  }
+
+  .login-user__name {
+    font-size: 1.125rem;
   }
 
   .login-button {
-    font-size: 0.875rem;
-    padding-block: 0.875em;
+    font-size: var(--fs-default);
+    padding-block: 1em;
   }
 }
 
