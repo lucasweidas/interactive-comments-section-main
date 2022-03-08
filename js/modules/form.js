@@ -1,6 +1,7 @@
 import * as data from './data.js';
 import * as event from './event.js';
 
+// Will format the time in milliseconds into a timestamp string with the time elapsed between the creation of the comment and the present
 function formatCreationTime(date) {
   const seconds = Math.floor((new Date() - date) / 1000);
 
@@ -23,12 +24,14 @@ function formatCreationTime(date) {
   if (interval === 0) return 'today';
 }
 
+// It will check if the user "@mention" is the first string of the comment. If "true", this string will be returned, otherwise an empty string
 function getReplyingTo(text) {
   const regex = /^(^|[^\w@/\!?=&])@(\w{1,15})\b/;
   const replyingTo = regex.exec(text.trim());
   return replyingTo === null ? '' : replyingTo['2'];
 }
 
+// Will Save the User Comment or Reply in the "LocalStorage"
 function saveCommentOrReply(commentId, commentObj, text) {
   const comments = data.getComments();
   const replyingTo = getReplyingTo(text);
@@ -54,6 +57,7 @@ function saveCommentOrReply(commentId, commentObj, text) {
   return result;
 }
 
+// It will Update the User Comment or Reply and Save these changes in the "LocalStorage"
 export function saveUpdatedComment(commentId, text) {
   const comments = data.getComments();
   const replyingTo = getReplyingTo(text);
@@ -77,6 +81,8 @@ export function saveUpdatedComment(commentId, text) {
   return result;
 }
 
+// Will format the Comment Score and return into an string
+// Prevents large numbers from breaking the layout and is user friendly
 export function formatCommentScore(actualScore) {
   return Intl.NumberFormat('en-US', {
     notation: 'compact',
@@ -166,6 +172,7 @@ export function addEditForm(commentText) {
   return formUpdateClone;
 }
 
+// It will create all needed Login Cards and put them into the Cards Container
 export function createLoginCard(currentUser, user) {
   const loginCardsCon = document.querySelector('#login-cards');
   const loginCardTemplate = document.querySelector('#login-card-template');
@@ -190,6 +197,7 @@ export function createLoginCard(currentUser, user) {
   loginCardsCon.appendChild(loginCardClone);
 }
 
+// It will Create All Comments Container saved in the "LocalStorage"
 export function loadCreatedComments(userData, commentData, isReply) {
   const postTemplate = document.querySelector('#post-con-template');
   const postClone = postTemplate.content.cloneNode(true);
@@ -226,8 +234,8 @@ export function loadCreatedComments(userData, commentData, isReply) {
     optionsDiv.appendChild(replyBtnClone);
   }
 
-  alreadyVoted: if (commentData.usersUpVoted !== undefined) {
-    // <- REMOVER DEPOIS
+  // It will prevent the second "if" statement from making its logic if the first "if" statement is true. (is just a way to avoid wasting time)
+  alreadyVoted: {
     if (event.isAlreadyVoted(userData, commentData.usersUpVoted)) {
       const upVoteBtn = postClone.querySelector('.up-vote-btn');
       upVoteBtn.classList.add('voted');
@@ -250,6 +258,7 @@ export function loadCreatedComments(userData, commentData, isReply) {
   return postClone;
 }
 
+// Will create a Form Post Container
 export function createFormPost(currentUser) {
   const mainCon = document.querySelector('#main');
   const formTemplate = document.querySelector('#form-post-template');
@@ -263,6 +272,7 @@ export function createFormPost(currentUser) {
   mainCon.insertBefore(formClone, mainCon.lastElementChild);
 }
 
+// It will add the element that "@marks" the user to the comment container
 export function addReplyingToMark(element, replyingTo) {
   element.insertAdjacentHTML('afterbegin', `<strong class="replying-to">@${replyingTo}</strong>`);
 }

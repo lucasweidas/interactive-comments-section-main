@@ -5,6 +5,7 @@ const deleteCommentCon = document.querySelector('.del-comment-con');
 const headerCon = document.querySelector('#header');
 const del = {};
 
+// When the HTML parsing is done, do this
 document.addEventListener('DOMContentLoaded', async () => {
   const hasUser = localStorage.getItem('currentUser');
   const hasUsers = localStorage.getItem('users');
@@ -21,7 +22,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   event.loadFormPost();
 });
 
-// Will be called if any clicks occur within it
+// Main Container
+// "Click" Event Delegation
 mainCon.addEventListener('click', evt => {
   // If it's a Delete Comment Button
   const isDeleteBtn = evt.target.matches('.options__del-btn');
@@ -48,7 +50,8 @@ mainCon.addEventListener('click', evt => {
   if (isDownVoteBtn) return event.registerDownVote(evt);
 });
 
-// It will be called if any FORM within it is "submitted"
+// Main Container
+// "Submit" Event Delegation
 mainCon.addEventListener('submit', evt => {
   evt.preventDefault();
 
@@ -73,7 +76,8 @@ mainCon.addEventListener('submit', evt => {
   if (isSendBtn) return event.createNewPostComment(evt);
 });
 
-// The Confirm Delete Comment Overlay Container
+// Confirm Delete Comment Overlay Container
+// "Click" Event Delegation
 deleteCommentCon.addEventListener('click', evt => {
   // If it is the Overlay Container or the Button Cancel Delete Comment
   if (evt.target === deleteCommentCon || evt.target.id === 'cancel-del-comment') {
@@ -93,6 +97,8 @@ deleteCommentCon.addEventListener('click', evt => {
   }
 });
 
+// Header Container
+// "Click" Event Delegation
 headerCon.addEventListener('click', evt => {
   if (evt.target.matches('#switch-input')) {
     event.changeTheme(evt.target.checked.toString());
@@ -100,7 +106,13 @@ headerCon.addEventListener('click', evt => {
 
   // If it is the Menu Button
   if (evt.target.matches('#menu-btn')) {
-    return headerCon.classList.toggle('active');
+    headerCon.classList.toggle('active');
+
+    const isActive = headerCon.classList.contains('active');
+    evt.target.ariaExpanded = isActive;
+
+    if (isActive) return (evt.target.ariaLabel = 'Close User Menu');
+    return (evt.target.ariaLabel = 'Open User Menu');
   }
 
   // If it is a Login Button that is "not" that of the Current User

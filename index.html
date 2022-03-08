@@ -6,6 +6,7 @@
     <title>Frontend Mentor | Interactive comments section</title>
     <link rel="icon" type="image/png" sizes="32x32" href="./images/favicon-32x32.png" />
     <script>
+      // This will prevent color flickering on reload
       if (localStorage.darkMode === 'true') document.documentElement.setAttribute('data-dark-mode', '');
     </script>
     <link rel="stylesheet" href="css/style.css" />
@@ -29,7 +30,7 @@
             <i class="fa-solid fa-sun"></i>
           </label>
         </div>
-        <button id="menu-btn" title="User Menu"></button>
+        <button id="menu-btn" aria-label="Open User Menu" aria-haspopup="true" aria-controls="menu-drop-down" aria-expanded="false"></button>
       </div>
       <div id="menu-drop-down">
         <div id="drop-down-content">

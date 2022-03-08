@@ -11,6 +11,7 @@ function getDirectChild(element, selector) {
   return [...element.children].find(child => child.matches(selector));
 }
 
+// Will get "replies" child or the closest "replies" Section
 function getRepliesSection(postCon) {
   const repliesCon = postCon.querySelector('.replies');
   if (repliesCon === null) {
@@ -19,6 +20,7 @@ function getRepliesSection(postCon) {
   return repliesCon;
 }
 
+// It gets the Comment Id value from the attribute in the Comment Container
 function getCommentId(element) {
   return element.closest('.post-con').dataset.commentId;
 }
@@ -223,10 +225,7 @@ export function registerDownVote(evt) {
 
 // It will check if the current user has already voted on the comment
 export function isAlreadyVoted(currentUser, users) {
-  return users.reduce((hasVoted, user) => {
-    if (user == currentUser.username) hasVoted = true;
-    return hasVoted;
-  }, false);
+  return users.find(user => user === currentUser.username) ? true : false;
 }
 
 // It will delete the comment from "localStorage"
@@ -268,6 +267,7 @@ export function loadComments() {
   });
 }
 
+// Will load all Login Cards
 export function loadLoginCards() {
   const currentUser = data.getCurrentUser();
   const allUsers = data.getUsers();
@@ -275,11 +275,17 @@ export function loadLoginCards() {
   allUsers.forEach(user => form.createLoginCard(currentUser, user));
 }
 
+// It will Load the Form Post Container
 export function loadFormPost() {
   const currentUser = data.getCurrentUser();
   form.createFormPost(currentUser);
 }
 
+// Every Time the User changes the Current User, it will:
+// Remove All Login Cards
+// Remove All Comments
+// Remove the Form Post Container
+// And finally, it will recreate all the deleted elements again
 export function changeCurrentUser(evt) {
   const allUsers = data.getUsers();
   const mainCon = document.querySelector('#main');
@@ -303,6 +309,7 @@ export function changeCurrentUser(evt) {
   });
 }
 
+// Will add or remove the "Dark Mode" theme and save this information to the "LocalStorage"
 export function changeTheme(isDarkMode) {
   const checkbox = document.querySelector('#switch-input');
   const label = document.querySelector('#switch-label');
@@ -313,7 +320,7 @@ export function changeTheme(isDarkMode) {
     label.ariaLabel = 'Switch theme to light mode';
     return document.documentElement.setAttribute('data-dark-mode', '');
   }
-  
+
   label.ariaLabel = 'Switch theme to dark mode';
   document.documentElement.removeAttribute('data-dark-mode');
 }
@@ -330,6 +337,7 @@ export async function createLocalStorage() {
   localStorage.setItem('darkMode', false);
 }
 
+// Creates an Array of User Objects and converts it to JSON
 function createUsersJSON() {
   return JSON.stringify([
     {
@@ -380,6 +388,7 @@ function getCorrectComment(comments, commentId) {
   return correctComment;
 }
 
+// It will remove ALL child elements from a parent element
 function removeAllChildren(element) {
   while (element.firstElementChild) {
     element.removeChild(element.firstElementChild);
