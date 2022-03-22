@@ -7,7 +7,7 @@ Thanks for checking out this front-end coding challenge solution.
 ## Table of contents
 
 - [Overview](#overview)
-  - [Preview Screenshot](#screenshot)
+  - [Preview Screenshot](#preview-screenshot)
   - [Links](#links)
 - [My process](#my-process)
   - [Built with](#built-with)

@@ -229,7 +229,8 @@ svg {
   transition: transform var(--theme-transition);
 }
 
-#switch-input:checked + #switch-label::after {
+#switch-input:checked + #switch-label::after,
+[data-dark-mode] #switch-label::after {
   transform: translateX(1.375rem);
 }
 
